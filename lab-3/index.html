@@ -1,0 +1,694 @@
+<!--
+Matric Number: A219834
+Name: Muhammad Haris Syahmi bin Nasurudin
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#121212">
+    <title>Menu | My Personal Pages</title>
+
+    <!-- Bootstrap Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+    <!-- Figtree: free font closest to Spotify's Circular -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --green: #1ed760;
+            --green-hover: #3be477;
+            --panel: #121212;
+            --subdued: #b3b3b3;
+            /* >>> YOUR PICTURE: put the file in the same folder as menu.html.
+                   Change the file name here if yours is different. <<< */
+            --banner: url("banner.jpg");
+            --font: "Circular Std", "Spotify Mix", "Figtree", "Helvetica Neue", Arial, sans-serif;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        html { background: var(--panel); scroll-behavior: smooth; }
+
+        body {
+            position: relative;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            background: var(--panel);
+            color: #fff;
+            font-family: var(--font);
+            -webkit-font-smoothing: antialiased;
+            overflow-x: hidden;
+        }
+
+        /* Picture at the top. Falls back to the green gradient if the file is missing. */
+        .banner {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 480px;
+            z-index: 0;
+            pointer-events: none;
+            overflow: hidden;
+        }
+        /* Two stacked layers that crossfade when the picture changes.
+           Each layer = dark fade + picture + coloured gradient fallback. */
+        .banner-layer {
+            position: absolute;
+            inset: 0;
+            opacity: 0;
+            transition: opacity .7s ease;
+            background:
+                linear-gradient(180deg, rgba(18,18,18,.15) 0%, rgba(18,18,18,.55) 60%, #121212 100%),
+                var(--banner, none) center / cover no-repeat,
+                linear-gradient(180deg, color-mix(in srgb, var(--tint, #1ed760) 45%, #121212) 0, #121212 100%);
+        }
+        .banner-layer.on { opacity: 1; }
+
+        .header, main, #footer { position: relative; z-index: 1; }
+
+        a { color: inherit; text-decoration: none; }
+        svg { display: block; fill: currentColor; }
+        :focus-visible { outline: 2px solid #fff; outline-offset: 2px; }
+
+        ::-webkit-scrollbar { width: 12px; }
+        ::-webkit-scrollbar-thumb {
+            background: rgba(255,255,255,.3);
+            border-radius: 6px;
+            border: 3px solid transparent;
+            background-clip: padding-box;
+        }
+
+        /* ---------- TOP BAR ---------- */
+
+        .topbar {
+            position: sticky;
+            top: 0;
+            z-index: 10;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            padding: 16px 32px;
+            transition: background .25s;
+        }
+        .topbar.solid { background: rgba(18, 18, 18, .92); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); }
+
+        .history { display: flex; gap: 8px; }
+
+        .round-btn {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            border: none;
+            background: rgba(0, 0, 0, .7);
+            color: #fff;
+            display: grid;
+            place-items: center;
+            cursor: pointer;
+            transition: transform .1s, background .2s;
+        }
+        .round-btn:hover { transform: scale(1.06); background: rgba(0, 0, 0, .9); }
+        .round-btn svg { width: 16px; height: 16px; }
+        .round-btn[aria-disabled="true"] { opacity: .5; pointer-events: none; }
+
+        .avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            border: 4px solid #000;
+            background: var(--green);
+            color: #000;
+            font-size: 12px;
+            font-weight: 800;
+            display: grid;
+            place-items: center;
+            box-sizing: content-box;
+            margin: -4px;
+        }
+
+        /* ---------- HEADER ---------- */
+
+        .header { padding: 24px 32px 28px; }
+
+        .header .kind { font-size: 14px; font-weight: 700; margin-bottom: 8px; }
+
+        .header h1 {
+            font-size: clamp(36px, 7vw, 88px);
+            font-weight: 900;
+            line-height: 1;
+            letter-spacing: -.04em;
+            overflow-wrap: anywhere;
+            margin-bottom: 20px;
+        }
+
+        .header .meta {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 6px;
+            font-size: 14px;
+            color: #ffffffcc;
+        }
+        .header .meta strong { color: #fff; font-weight: 700; }
+        .header .meta .mini {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: var(--green);
+            color: #000;
+            font-size: 10px;
+            font-weight: 800;
+            display: grid;
+            place-items: center;
+        }
+        .dot::before { content: "•"; margin: 0 2px; }
+
+        /* ---------- CONTENT ---------- */
+
+        main { flex: 1; padding: 8px 32px 40px; }
+
+        .section-title {
+            font-size: 24px;
+            font-weight: 700;
+            letter-spacing: -.01em;
+            margin-bottom: 16px;
+        }
+
+        /* quick-access tiles, like Spotify's home shortcuts */
+        .menu-grid {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));   /* 3 boxes per row */
+            gap: 16px;
+        }
+
+        .tile {
+            position: relative;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            height: 80px;
+            border-radius: 4px;
+            background: rgba(255, 255, 255, .1);
+            overflow: hidden;
+            transition: background .3s;
+            user-select: none;
+        }
+        .tile:hover, .tile:focus-visible { background: rgba(255, 255, 255, .2); }
+
+        .tile-art {
+            position: relative;
+            width: 80px;
+            height: 80px;
+            flex-shrink: 0;
+            display: grid;
+            place-items: center;
+            font-size: 32px;
+            color: #fff;
+            box-shadow: 4px 0 16px rgba(0, 0, 0, .3);
+            overflow: hidden;
+        }
+
+        .tile-art img {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .tile-text { min-width: 0; padding-right: 72px; }
+        .tile-title {
+            font-size: 16px;
+            font-weight: 700;
+            line-height: 1.25;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+        .tile-sub {
+            font-size: 13px;
+            color: var(--subdued);
+            margin-top: 2px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .tile-play {
+            position: absolute;
+            right: 16px;
+            top: 50%;
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            background: var(--green);
+            color: #000;
+            display: grid;
+            place-items: center;
+            box-shadow: 0 8px 8px rgba(0, 0, 0, .3);
+            opacity: 0;
+            transform: translateY(-30%);
+            transition: opacity .3s, transform .3s, background .2s;
+        }
+        .tile-play svg { width: 24px; height: 24px; }
+        .tile:hover .tile-play, .tile:focus-visible .tile-play {
+            opacity: 1;
+            transform: translateY(-50%);
+        }
+        .tile-play:hover { background: var(--green-hover); }
+
+
+        /* ---------- PAGE VIEWER (opens under the box) ---------- */
+
+        .tile.active { background: rgba(255, 255, 255, .2); }
+        .tile.active .tile-title { color: var(--green); }
+        .tile.active .tile-play { opacity: 1; transform: translateY(-50%); }
+
+        .viewer {
+            grid-column: 1 / -1;
+            margin: 4px 0 8px;
+            background: #181818;
+            border: 1px solid #ffffff1a;
+            border-radius: 8px;
+            overflow: hidden;
+            scroll-margin-top: 72px;
+        }
+        .viewer[hidden] { display: none; }
+
+        .viewer-head {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            padding: 12px 16px;
+            background: #ffffff0d;
+            border-bottom: 1px solid #ffffff1a;
+        }
+        .viewer-title { display: flex; align-items: center; gap: 12px; min-width: 0; }
+        .viewer-art {
+            position: relative;
+            width: 40px;
+            height: 40px;
+            flex-shrink: 0;
+            border-radius: 4px;
+            display: grid;
+            place-items: center;
+            font-size: 18px;
+            color: #fff;
+            overflow: hidden;
+        }
+        .viewer-art img {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .viewer-kind { font-size: 11px; font-weight: 700; color: var(--subdued); text-transform: uppercase; letter-spacing: .08em; }
+        .viewer-title h3 { font-size: 18px; font-weight: 800; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+        .viewer-actions { display: flex; align-items: center; gap: 12px; flex-shrink: 0; }
+        .viewer-open {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 7px 16px;
+            border: 1px solid #727272;
+            border-radius: 999px;
+            font-size: 13px;
+            font-weight: 700;
+            white-space: nowrap;
+            transition: border-color .2s, transform .1s;
+        }
+        .viewer-open:hover { border-color: #fff; transform: scale(1.03); }
+        .viewer .round-btn { background: #ffffff1a; }
+        .viewer .round-btn i { font-size: 14px; }
+
+        .viewer-body { position: relative; background: #121212; }
+        .viewer-body iframe {
+            display: block;
+            width: 100%;
+            height: 640px;
+            border: 0;
+            background: #121212;
+        }
+        .viewer-loading {
+            position: absolute;
+            inset: 0;
+            display: grid;
+            place-items: center;
+            color: var(--subdued);
+            font-size: 14px;
+            font-weight: 600;
+            pointer-events: none;
+        }
+        .viewer-loading.done { display: none; }
+
+        @media (max-width: 640px) {
+            .viewer-open span, .viewer-open { padding: 7px 12px; font-size: 12px; }
+            .viewer-body iframe { height: 520px; }
+        }
+
+        /* ---------- FOOTER ---------- */
+
+        #footer {
+            padding: 24px 32px;
+            border-top: 1px solid #ffffff1a;
+            color: var(--subdued);
+            font-size: 12px;
+            text-align: center;
+        }
+        #footnote { font-weight: 700; color: #fff; }
+
+        /* ---------- RESPONSIVE ---------- */
+
+        @media (max-width: 900px) {
+            .menu-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+        }
+
+        @media (max-width: 640px) {
+            .topbar { padding: 12px 16px; }
+            .header { padding: 12px 16px 20px; }
+            main { padding: 8px 16px 32px; }
+            .menu-grid { grid-template-columns: 1fr; gap: 8px; }
+            .tile-play { opacity: 1; transform: translateY(-50%); width: 40px; height: 40px; }
+            #footer { padding: 20px 16px; }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            * { transition: none !important; scroll-behavior: auto !important; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Banner picture (set in --banner above) -->
+    <div class="banner" aria-hidden="true">
+        <div class="banner-layer on" id="bannerA"></div>
+        <div class="banner-layer" id="bannerB"></div>
+    </div>
+
+    <!-- Top bar -->
+    <div class="topbar" id="topbar">
+        <div class="history">
+            <!-- Back button navigating directly to menu.html in the root www directory -->
+            <button type="button" class="round-btn" id="back-btn" aria-label="Go back to Menu" title="Go to menu.html">
+                <svg viewBox="0 0 16 16"><path d="M11.03.47a.75.75 0 0 1 0 1.06L4.56 8l6.47 6.47a.75.75 0 1 1-1.06 1.06L2.44 8 9.97.47a.75.75 0 0 1 1.06 0z"/></svg>
+            </button>
+        </div>
+        <span class="avatar" aria-hidden="true">HS</span>
+    </div>
+
+    <!-- Header -->
+    <header class="header" id="header">
+        <p class="kind">Menu</p>
+        <h1 id="title">Cascading Style Sheets</h1>
+        <div class="meta">
+            <span class="mini">HS</span>
+            <strong>Muhammad Haris Syahmi</strong>
+            <span class="dot">A219834</span>
+            <span class="dot">1 pages</span>
+        </div>
+    </header>
+
+    <!-- Main menu -->
+    <main id="content">
+        <h2 class="section-title">Pick a page</h2>
+
+        <div class="menu-grid">
+            <!-- Home tile pointing to menu.html in the root www folder (no song) -->
+            <a href="http://lrgs.ftsm.ukm.my/users/a219834/menu.html" class="tile nav-link-item">
+                <span class="tile-art" style="background:#1ed760;color:#000"><i class="bi bi-house-door-fill"></i></span>
+                <span class="tile-text">
+                    <span class="tile-title">Home</span>
+                    <span class="tile-sub">Main portfolio</span>
+                </span>
+                <span class="tile-play" aria-hidden="true"><svg viewBox="0 0 16 16"><path d="M3 1.713a.7.7 0 0 1 1.05-.607l10.89 6.288a.7.7 0 0 1 0 1.212L4.05 14.894A.7.7 0 0 1 3 14.288V1.713z"/></svg></span>
+            </a>
+
+            <!-- Content Stylesheet  (data-song must match a key in AUDIO_MAP in index.html) -->
+            <a href="content.php" class="tile embed-tile" data-song="content" data-title="Content Stylesheet" aria-expanded="false" aria-controls="viewer">
+                <span class="tile-art" style="background:#e8115b">
+                    <img src="images3.jpeg" alt="Content Stylesheet" onerror="this.remove()">
+                    <i class="bi bi-emoji-smile-fill"></i>
+                </span>
+                <span class="tile-text">
+                    <span class="tile-title">Content Stylesheet</span>
+                    <span class="tile-sub">Choose Your Style</span>
+                </span>
+                <span class="tile-play" aria-hidden="true"><svg viewBox="0 0 16 16"><path d="M3 1.713a.7.7 0 0 1 1.05-.607l10.89 6.288a.7.7 0 0 1 0 1.212L4.05 14.894A.7.7 0 0 1 3 14.288V1.713z"/></svg></span>
+            </a>
+
+            <!-- Biodata Form  (data-song must match a key in AUDIO_MAP in index.html) -->
+            <a href="biodata.php" class="tile embed-tile" data-song="biodata" data-title="Biodata Form" aria-expanded="false" aria-controls="viewer">
+                <span class="tile-art" style="background:#e8115b">
+                    <img src="images3.jpeg" alt="Biodata Form" onerror="this.remove()">
+                    <i class="bi bi-emoji-smile-fill"></i>
+                </span>
+                <span class="tile-text">
+                    <span class="tile-title">Biodata Form</span>
+                    <span class="tile-sub">Your Biodata</span>
+                </span>
+                <span class="tile-play" aria-hidden="true"><svg viewBox="0 0 16 16"><path d="M3 1.713a.7.7 0 0 1 1.05-.607l10.89 6.288a.7.7 0 0 1 0 1.212L4.05 14.894A.7.7 0 0 1 3 14.288V1.713z"/></svg></span>
+            </a>
+
+            <!-- Page viewer: moved directly under the row of the box you click -->
+            <section class="viewer" id="viewer" hidden aria-live="polite">
+                <div class="viewer-head">
+                    <div class="viewer-title">
+                        <span class="viewer-art" id="viewerArt" aria-hidden="true"></span>
+                        <div>
+                            <p class="viewer-kind">Now showing</p>
+                            <h3 id="viewerTitle"></h3>
+                        </div>
+                    </div>
+                    <div class="viewer-actions">
+                        <a id="viewerOpen" class="viewer-open" href="#" target="_blank" rel="noopener">
+                            Open full page <i class="bi bi-box-arrow-up-right"></i>
+                        </a>
+                        <button type="button" class="round-btn" id="viewerClose" aria-label="Close page" title="Close">
+                            <i class="bi bi-x-lg"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="viewer-body">
+                    <div class="viewer-loading" id="viewerLoading">Loading…</div>
+                    <iframe id="viewerFrame" title="Selected page"></iframe>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <div id="footer">
+        <span id="footnote">Web Programming &#64; UKM &trade;</span>
+    </div>
+
+    <script>
+        const backBtn = document.getElementById('back-btn');
+
+        // Menu tiles direct navigation (Home)
+        document.querySelectorAll('.nav-link-item').forEach(link => {
+            link.addEventListener('click', (e) => {
+                const url = link.getAttribute('href');
+                if (!url || url === '#') return;
+                e.preventDefault();
+                window.location.href = url;
+            });
+        });
+
+        // Back arrow: Navigates directly to menu.html in the main www root directory
+        backBtn.addEventListener('click', () => {
+            window.location.href = 'http://lrgs.ftsm.ukm.my/users/a219834/menu.html';
+        });
+
+        // Keyboard: Alt + Left
+        document.addEventListener('keydown', (e) => {
+            if (!e.altKey) return;
+            if (e.key === 'ArrowLeft') { e.preventDefault(); backBtn.click(); }
+        });
+
+        // ---------- Open a page under the box that was clicked ----------
+        const grid        = document.querySelector('.menu-grid');
+        const viewer      = document.getElementById('viewer');
+        const viewerFrame = document.getElementById('viewerFrame');
+        const viewerLoad  = document.getElementById('viewerLoading');
+        const viewerTitle = document.getElementById('viewerTitle');
+        const viewerArt   = document.getElementById('viewerArt');
+        const viewerOpen  = document.getElementById('viewerOpen');
+        const embedTiles  = Array.from(document.querySelectorAll('.embed-tile'));
+        const allTiles    = Array.from(document.querySelectorAll('.tile'));
+        let activeTile = null;
+
+        // Put the viewer right after the last box of the clicked box's row
+        function placeViewer(tile) {
+            const cols = getComputedStyle(grid).gridTemplateColumns.split(' ').length;
+            const i = allTiles.indexOf(tile);
+            const lastInRow = Math.min((Math.floor(i / cols) + 1) * cols, allTiles.length) - 1;
+            allTiles[lastInRow].after(viewer);
+        }
+
+        function openPageUnder(tile) {
+            activeTile = tile;
+            if (window.parent === window) setBanner(tile);   // alone: no player, so follow the clicked box
+            const url = tile.getAttribute('href');
+
+            allTiles.forEach(t => {
+                t.classList.toggle('active', t === tile);
+                if (t.classList.contains('embed-tile')) t.setAttribute('aria-expanded', t === tile);
+            });
+
+            // copy the box's colour + picture/icon into the viewer header
+            const art = tile.querySelector('.tile-art');
+            viewerArt.style.background = art.style.background;
+            viewerArt.style.color = art.style.color || '#fff';
+            viewerArt.innerHTML = art.innerHTML;
+            viewerTitle.textContent = tile.dataset.title;
+            viewerOpen.href = url;
+            viewerFrame.title = tile.dataset.title;
+
+            viewerLoad.classList.remove('done');
+            viewerFrame.style.height = '';
+            viewerFrame.src = url;
+
+            placeViewer(tile);
+            viewer.hidden = false;
+            setTimeout(() => viewer.scrollIntoView({ behavior: 'smooth', block: 'start' }), 50);
+        }
+
+        function closeViewer() {
+            viewer.hidden = true;
+            setBanner(window.parent === window ? null : songTile(currentSong));   // keep the playing song's picture
+            viewerFrame.src = 'about:blank';
+            allTiles.forEach(t => {
+                t.classList.remove('active');
+                if (t.classList.contains('embed-tile')) t.setAttribute('aria-expanded', 'false');
+            });
+            if (activeTile) activeTile.focus({ preventScroll: true });
+            activeTile = null;
+        }
+
+        embedTiles.forEach(tile => {
+            tile.addEventListener('click', (e) => {
+                e.preventDefault();
+                if (activeTile === tile && !viewer.hidden) {
+                    closeViewer();                 // closing a page leaves the music playing
+                } else {
+                    openPageUnder(tile);
+                    playSong(tile);                // opening a page starts its song
+                }
+            });
+        });
+
+        document.getElementById('viewerClose').addEventListener('click', closeViewer);
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && !viewer.hidden) closeViewer();
+        });
+
+        // When the page has loaded: hide "Loading…" and grow the frame if the page is taller
+        viewerFrame.addEventListener('load', () => {
+            if (viewerFrame.src === 'about:blank' || viewer.hidden) return;
+            viewerLoad.classList.add('done');
+            try {
+                const d = viewerFrame.contentDocument;
+                const h = Math.max(d.documentElement.scrollHeight, d.body.scrollHeight);
+                if (h > 640) viewerFrame.style.height = Math.min(h, 1600) + 'px';
+            } catch (_) { /* different origin: keep the default height */ }
+        });
+
+        // Keep the viewer under the right row when the screen size changes
+        window.addEventListener('resize', () => {
+            if (activeTile && !viewer.hidden) placeViewer(activeTile);
+        });
+
+        // Top bar turns solid once you scroll
+        const topbar = document.getElementById('topbar');
+        window.addEventListener('scroll', () => {
+            topbar.classList.toggle('solid', window.scrollY > 120);
+        }, { passive: true });
+
+        /* ---------- Background picture follows the clicked box ----------
+           Uses the box's own picture. To use a different picture for a box,
+           add data-banner="otherpicture.jpg" to that box's <a> tag. */
+
+        const bannerLayers = [document.getElementById('bannerA'), document.getElementById('bannerB')];
+        let bannerFront = 0;
+        let bannerTile = null;
+
+        let currentSong = null;
+function songTile(key) { return embedTiles.find(t => t.dataset.song === key) || null; }
+
+        function setBanner(tile) {
+            if (tile === bannerTile) return;
+            bannerTile = tile;
+
+            const next = bannerLayers[1 - bannerFront];
+            const prev = bannerLayers[bannerFront];
+
+            if (tile) {
+                const art = tile.querySelector('.tile-art');
+                const img = art.querySelector('img');
+                const src = tile.dataset.banner || (img ? img.src : '');
+                next.style.setProperty('--banner', src ? 'url("' + src + '")' : 'none');
+                next.style.setProperty('--tint', art.style.background);
+            } else {                                   // back to the default banner.jpg
+                next.style.removeProperty('--banner');
+                next.style.removeProperty('--tint');
+            }
+
+            next.classList.add('on');
+            prev.classList.remove('on');
+            bannerFront = 1 - bannerFront;
+        }
+
+        /* ---------- Music: talk to the player in index.html ----------
+           Every tile with a data-song attribute (all except Home) plays the
+           song with the same key in AUDIO_MAP (index.html). */
+
+        function initials(text) {
+            return text.split(/\s+/).map(w => w[0]).join('').slice(0, 3).toUpperCase();
+        }
+
+        function sendCatalog() {
+            if (window.parent === window) return;      // opened on its own, no player to talk to
+            const queue = embedTiles.filter(t => t.dataset.song).map(t => {
+                const art = t.querySelector('.tile-art');
+                const img = art.querySelector('img');
+                return {
+                    key:   t.dataset.song,
+                    title: t.dataset.title,
+                    sub:   'Haris Syahmi · Portfolio',
+                    kind:  'page',
+                    color: art.style.background,
+                    badge: initials(t.dataset.title),
+                    img:   img ? img.src : ''
+                };
+            });
+            window.parent.postMessage({ type: 'catalog', queue: queue }, '*');
+        }
+
+        function playSong(tile) {
+            if (window.parent === window || !tile.dataset.song) return;
+            window.parent.postMessage({ type: 'start', key: tile.dataset.song }, '*');
+        }
+
+        window.addEventListener('message', (e) => {
+    if (e.source !== window.parent) return;
+    const m = e.data || {};
+    if (m.type === 'hello') sendCatalog();
+    else if (m.type === 'state') {                 // player says which song is current
+        currentSong = m.key;
+        setBanner(songTile(m.key));                // that song's picture becomes the background
+    }
+});
+        sendCatalog();
+    </script>
+</body>
+</html>

@@ -1,0 +1,719 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Muhammad Haris Syahmi | Menu</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+  <!--
+    menu.html  =  the RED part: top bar, hero, action row, weekly labs, capstone.
+    It is loaded inside index.html (the YELLOW part: sidebar + player bar).
+
+    How the two files talk (window.postMessage):
+      menu  -> index : { type:"catalog", queue }   list of labs + milestones
+                       { type:"play",   key }      play this item
+                       { type:"select", key }      load this item without playing
+                       { type:"toggle" }           play / pause
+                       { type:"like" }             heart on / off
+      index -> menu  : { type:"state", key, playing, liked }
+                       { type:"goto",   id }        scroll to a section
+    Opened on its own (not inside index.html) the page still works as a normal page.
+  -->
+
+  <style>
+    :root {
+      --green: #1ed760;
+      --green-hover: #3be477;
+      --panel: #121212;
+      --highlight: #1f1f1f;
+      --hover: #2a2a2a;
+      --text: #fff;
+      --subdued: #b3b3b3;
+      --font: "Circular Std", "Spotify Mix", "Figtree", "Helvetica Neue", Arial, sans-serif;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; background: var(--panel); }
+
+    body {
+      min-height: 100vh;
+      background: linear-gradient(180deg, #1f5c38 0, #153f27 220px, var(--panel) 520px) no-repeat top / 100% 520px, var(--panel);
+      color: var(--text);
+      font-family: var(--font);
+      -webkit-font-smoothing: antialiased;
+    }
+
+    a { color: inherit; text-decoration: none; }
+    button { font-family: inherit; }
+    svg { display: block; fill: currentColor; }
+    :focus-visible { outline: 2px solid #fff; outline-offset: 2px; }
+
+    ::-webkit-scrollbar { width: 12px; }
+    ::-webkit-scrollbar-thumb {
+      background: rgba(255,255,255,.3);
+      border-radius: 6px;
+      border: 3px solid transparent;
+      background-clip: padding-box;
+    }
+
+    /* ---------- TOP BAR ---------- */
+
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      padding: 16px 32px;
+      transition: background .25s;
+    }
+    .topbar.solid { background: #153f27; }
+
+    .history { display: flex; gap: 8px; }
+    .round-btn {
+      width: 32px; height: 32px;
+      border-radius: 50%;
+      border: none;
+      background: rgba(0,0,0,.7);
+      color: #fff;
+      display: grid;
+      place-items: center;
+      cursor: pointer;
+    }
+    .round-btn svg { width: 16px; height: 16px; }
+
+    .top-actions { display: flex; align-items: center; gap: 12px; }
+
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border: none;
+      border-radius: 999px;
+      padding: 8px 32px;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: transform .1s;
+      white-space: nowrap;
+    }
+    .pill:hover { transform: scale(1.04); }
+    .pill.white { background: #fff; color: #000; }
+    .pill.dark { background: rgba(0,0,0,.7); color: #fff; padding: 8px 16px; cursor: default; }
+    .pill.dark:hover { transform: none; }
+
+    .avatar-btn {
+      width: 32px; height: 32px;
+      border-radius: 50%;
+      border: 4px solid #000;
+      background: var(--green);
+      color: #000;
+      font-weight: 800;
+      font-size: 12px;
+      display: grid;
+      place-items: center;
+      box-sizing: content-box;
+      margin: -4px;
+    }
+
+    /* ---------- HERO ---------- */
+
+    .hero {
+      display: flex;
+      align-items: flex-end;
+      gap: 24px;
+      padding: 8px 32px 24px;
+    }
+
+    .cover {
+      position: relative;
+      width: 232px; height: 232px;
+      flex-shrink: 0;
+      border-radius: 4px;
+      box-shadow: 0 4px 60px rgba(0,0,0,.5);
+      background: linear-gradient(135deg, #450af5, #8e8ee5);
+      display: grid;
+      place-items: center;
+      overflow: hidden;
+    }
+    .cover img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+    .cover-fallback { font-size: 90px; font-weight: 900; color: #fff; }
+
+    .hero-text { min-width: 0; }
+    .hero-kind { font-size: 14px; font-weight: 700; margin-bottom: 8px; }
+    h1 {
+      font-size: clamp(36px, 6.5vw, 96px);
+      line-height: 1;
+      letter-spacing: -.04em;
+      font-weight: 900;
+      margin-bottom: 24px;
+      overflow-wrap: anywhere;
+    }
+    .hero-meta {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 6px;
+      font-size: 14px;
+      color: #ffffffcc;
+    }
+    .hero-meta strong { color: #fff; font-weight: 700; }
+    .mini-avatar {
+      width: 24px; height: 24px; border-radius: 50%;
+      background: var(--green); color: #000;
+      font-size: 10px; font-weight: 800;
+      display: grid; place-items: center;
+    }
+    .dot::before { content: "•"; margin: 0 2px; }
+
+    /* ---------- ACTION ROW ---------- */
+
+    .action-bar {
+      display: flex;
+      align-items: center;
+      gap: 32px;
+      padding: 24px 32px;
+      background: rgba(0,0,0,.2);
+    }
+
+    .big-play {
+      width: 56px; height: 56px;
+      border-radius: 50%;
+      border: none;
+      background: var(--green);
+      color: #000;
+      display: grid;
+      place-items: center;
+      cursor: pointer;
+      transition: transform .1s, background .2s;
+    }
+    .big-play:hover { transform: scale(1.06); background: var(--green-hover); }
+    .big-play svg { width: 28px; height: 28px; }
+
+    .icon-btn {
+      background: none;
+      border: none;
+      color: var(--subdued);
+      cursor: pointer;
+      display: grid;
+      place-items: center;
+      transition: color .2s, transform .1s;
+    }
+    .icon-btn:hover { color: #fff; transform: scale(1.06); }
+    .icon-btn.on { color: var(--green); }
+    .action-bar .icon-btn svg { width: 32px; height: 32px; }
+
+    /* ---------- HEART ---------- */
+    .icon-btn .heart { overflow: visible; }
+    .icon-btn .heart path {
+      fill: none;
+      stroke: currentColor;
+      stroke-width: 2;
+      stroke-linejoin: round;
+      transition: fill .15s;
+    }
+    .icon-btn.on { color: var(--green); }
+    .icon-btn.on .heart path { fill: currentColor; }
+    .icon-btn.pop .heart { animation: heartPop .35s cubic-bezier(.3, 1.6, .5, 1); }
+    @keyframes heartPop {
+      0%   { transform: scale(.8); }
+      60%  { transform: scale(1.25); }
+      100% { transform: scale(1); }
+    }
+
+    .content { padding: 0 32px 40px; }
+
+    /* ---------- SECTIONS ---------- */
+
+    .section { margin-top: 28px; scroll-margin-top: 72px; }
+
+    .section-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: 16px;
+      margin-bottom: 16px;
+    }
+    .section-header h2 { font-size: 24px; font-weight: 700; letter-spacing: -.01em; }
+    .section-header .count { color: var(--subdued); font-size: 14px; font-weight: 700; }
+
+    /* ---------- LAB CARDS ---------- */
+
+    .card-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(176px, 1fr));
+      gap: 8px;
+      margin: 0 -12px;
+    }
+
+    .card {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      padding: 12px;
+      border-radius: 8px;
+      transition: background .3s;
+      cursor: pointer;
+      min-width: 0;
+    }
+    .card:hover, .card:focus-within { background: var(--highlight); }
+    .card.playing .card-title { color: var(--green); }
+
+    .artwork {
+      position: relative;
+      aspect-ratio: 1;
+      width: 100%;
+      border-radius: 6px;
+      overflow: hidden;
+      margin-bottom: 16px;
+      box-shadow: 0 8px 24px rgba(0,0,0,.5);
+      display: grid;
+      place-items: center;
+      text-align: center;
+      padding: 14px;
+      color: #fff;
+      font-weight: 800;
+      font-size: 18px;
+      line-height: 1.2;
+      letter-spacing: -.01em;
+    }
+    .artwork img {
+      position: absolute; inset: 0;
+      width: 100%; height: 100%;
+      object-fit: cover;
+    }
+
+    .card-play {
+      position: absolute;
+      right: 8px; bottom: 8px;
+      width: 48px; height: 48px;
+      border-radius: 50%;
+      border: none;
+      background: var(--green);
+      color: #000;
+      display: grid;
+      place-items: center;
+      cursor: pointer;
+      box-shadow: 0 8px 8px rgba(0,0,0,.3);
+      opacity: 0;
+      transform: translateY(8px);
+      transition: opacity .3s, transform .3s, background .2s;
+      z-index: 2;
+    }
+    .card-play svg { width: 24px; height: 24px; }
+    .card-play:hover { background: var(--green-hover); transform: scale(1.06); }
+    .card:hover .card-play, .card:focus-within .card-play, .card.playing .card-play {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    .card.playing .card-play:hover, .card:hover .card-play:hover { transform: scale(1.06); }
+
+    .card-title {
+      font-size: 16px;
+      font-weight: 700;
+      margin-bottom: 4px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .card-desc {
+      font-size: 14px;
+      line-height: 1.4;
+      color: var(--subdued);
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    /* ---------- CAPSTONE TRACK LIST ---------- */
+
+    .capstone-desc {
+      color: var(--subdued);
+      font-size: 14px;
+      line-height: 1.6;
+      max-width: 720px;
+      margin-bottom: 20px;
+    }
+
+    .track-head, .track {
+      display: grid;
+      grid-template-columns: 16px minmax(0, 6fr) minmax(0, 4fr) 100px;
+      gap: 16px;
+      align-items: center;
+      padding: 0 16px;
+    }
+
+    .track-head {
+      height: 36px;
+      color: var(--subdued);
+      font-size: 14px;
+      border-bottom: 1px solid #ffffff1a;
+      margin-bottom: 8px;
+    }
+    .track-head .hash { text-align: center; }
+
+    .track {
+      height: 56px;
+      border-radius: 4px;
+      color: var(--subdued);
+      font-size: 14px;
+      cursor: pointer;
+    }
+    .track:hover { background: #ffffff1a; }
+    .track.playing .track-name { color: var(--green); }
+    .track.playing .num span { color: var(--green); }
+
+    .track .num { text-align: center; font-size: 16px; position: relative; }
+    .track .num button {
+      display: none;
+      background: none; border: none; color: #fff; cursor: pointer;
+      position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%);
+    }
+    .track .num button svg { width: 16px; height: 16px; }
+    .track:hover .num span { visibility: hidden; }
+    .track:hover .num button { display: block; }
+
+    .track-main { display: flex; align-items: center; gap: 16px; min-width: 0; }
+    .track-thumb {
+      position: relative;
+      width: 40px; height: 40px; border-radius: 4px; flex-shrink: 0;
+      display: grid; place-items: center; font-size: 12px; font-weight: 800; color: #000;
+      overflow: hidden;
+    }
+    .track-thumb img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+    .track-name { color: #fff; font-size: 16px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .track-artist { margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .track-album { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .track-link { text-align: right; }
+    .track-link a { font-weight: 700; color: var(--subdued); }
+    .track-link a:hover { color: #fff; text-decoration: underline; }
+
+    footer {
+      padding: 32px;
+      margin-top: 24px;
+      color: var(--subdued);
+      font-size: 12px;
+      line-height: 1.8;
+      border-top: 1px solid #ffffff1a;
+    }
+    footer strong { color: #fff; font-weight: 700; }
+
+    /* ---------- RESPONSIVE ---------- */
+
+    @media (max-width: 800px) {
+      .track-head, .track { grid-template-columns: 16px minmax(0, 1fr) 90px; }
+      .track-album, .track-head .col-album { display: none; }
+    }
+
+    @media (max-width: 640px) {
+      .topbar { padding: 12px 16px; }
+      .top-actions .pill.white { display: none; }
+      .hero { flex-direction: column; align-items: flex-start; padding: 8px 16px 20px; }
+      .cover { width: 160px; height: 160px; align-self: center; }
+      .cover-fallback { font-size: 64px; }
+      .action-bar { padding: 16px; gap: 24px; }
+      .content { padding: 0 16px 32px; }
+      footer { padding: 24px 16px; }
+      .card-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); margin: 0 -8px; }
+      .card-play { opacity: 1; transform: none; width: 40px; height: 40px; }
+      .track-head, .track { padding: 0 4px; gap: 10px; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      * { transition: none !important; scroll-behavior: auto !important; }
+    }
+  </style>
+</head>
+
+<body>
+
+  <header class="topbar" id="topbar">
+    <div class="history">
+      <button class="round-btn" type="button" id="fwdBtn" aria-label="Go to Lab 1 Index" title="Go to Lab 1 Index">
+        <svg viewBox="0 0 16 16"><path d="M4.97.47a.75.75 0 0 0 0 1.06L11.44 8l-6.47 6.47a.75.75 0 1 0 1.06 1.06L13.56 8 6.03.47a.75.75 0 0 0-1.06 0z"/></svg>
+      </button>
+    </div>
+    <div class="top-actions">
+      <a class="pill white" href="http://lrgs.ftsm.ukm.my/users/a219834/#" target="_blank" rel="noopener">University profile</a>
+      <span class="pill dark">TTTM2113 · FTSM UKM</span>
+      <span class="avatar-btn" aria-hidden="true">HS</span>
+    </div>
+  </header>
+
+  <!-- HERO -->
+  <section class="hero" id="home">
+    <div class="cover">
+      <span class="cover-fallback" aria-hidden="true">H</span>
+      <img src="gambau2.jpeg" alt="Muhammad Haris Syahmi" onerror="this.remove()">
+    </div>
+    <div class="hero-text">
+      <p class="hero-kind">Public portfolio</p>
+      <h1>Muhammad Haris Syahmi</h1>
+      <div class="hero-meta">
+        <span class="mini-avatar">HS</span>
+        <strong>A219834</strong>
+        <span class="dot">TTTM2113 Web Development</span>
+        <span class="dot">15 items</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ACTION ROW -->
+  <div class="action-bar">
+    <button class="big-play" id="bigPlay" type="button" aria-label="Play portfolio"></button>
+    <button class="icon-btn" id="likeBtn" type="button" aria-label="Save to Your Library" aria-pressed="false" title="Save to Your Library">
+      <svg class="heart" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
+    </button>
+    <button class="icon-btn" type="button" aria-label="Open University profile" onclick="openPage('http://lrgs.ftsm.ukm.my/users/a219834/#')">
+      <svg viewBox="0 0 24 24"><path d="M4.5 13.5a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3zm7.5 0a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3zm7.5 0a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3z"/></svg>
+    </button>
+  </div>
+
+  <div class="content">
+
+    <!-- WEEKLY LABS -->
+    <section class="section" id="labs">
+      <div class="section-header">
+        <h2>Weekly labs</h2>
+        <span class="count">11 learning activities</span>
+      </div>
+      <div class="card-grid" id="labGrid"></div>
+    </section>
+
+    <!-- CAPSTONE -->
+    <section class="section" id="capstone">
+      <div class="section-header">
+        <h2>Capstone project</h2>
+        <span class="count">Back-office system</span>
+      </div>
+      <p class="capstone-desc">
+        An automotive performance parts &amp; accessories store back-office platform that
+        streamlines stock tracking, customer order workflows, and supplier management.
+      </p>
+
+      <div class="track-head">
+        <span class="hash">#</span>
+        <span>Title</span>
+        <span class="col-album">Stack</span>
+        <span style="text-align:right">Details</span>
+      </div>
+      <div id="trackList"></div>
+    </section>
+  </div>
+
+  <footer>
+    <strong>TTTM2113 Web Development</strong><br>
+    Universiti Kebangsaan Malaysia · FTSM<br>
+    © 2026 Muhammad Haris Syahmi bin Nasurudin (A219834)
+  </footer>
+
+  <script>
+    /* =====================================================
+       CONTENT DATA  (edit your labs / milestones here)
+
+       openOnPlay: true  ->  clicking the lab opens its page
+       (url) in the centre instead of playing a song.
+       ===================================================== */
+
+    const COLORS = ["#1ed760", "#e8115b", "#509bf5", "#af2896", "#f59b23",
+                    "#477d95", "#e13300", "#8d67ab", "#1e3264", "#ba5d07", "#608108"];
+
+    const labs = [
+      { n: 1,  title: "Basic HTML",            art: "BASIC HTML",   img: "images1.jpg",    url: "http://lrgs.ftsm.ukm.my/users/a219834/lab-1/index.html", openOnPlay: true, desc: "HTML elements, semantic tags, and page structure." },
+      { n: 2,  title: "HTML Forms",            art: "HTML FORMS",   img: "images6.jpeg",   url: "http://lrgs.ftsm.ukm.my/users/a219834/lab-2/index.html", openOnPlay: true, desc: "Structured forms and collecting user input." },
+      { n: 3,  title: "Cascading Style Sheets", art: "CSS",          img: "images/lab3.jpg",  url: "http://lrgs.ftsm.ukm.my/users/a219834/lab-3/index.html", openOnPlay: true, desc: "Designing, laying out, and styling pages with CSS." },
+      { n: 4,  title: "Bootstrap 5",            art: "BOOTSTRAP",    img: "images/lab4.jpg",  url: "lab4.html",  desc: "Responsive, mobile-first interfaces with Bootstrap 5." },
+      { n: 5,  title: "Basic PHP",              art: "PHP",          img: "images/lab5.jpg",  url: "lab5.html",  desc: "Server-side logic and script execution using PHP." },
+      { n: 6,  title: "PHP + MySQL",            art: "PHP + MYSQL",  img: "images/lab6.jpg",  url: "lab6.html",  desc: "Connecting PHP applications to a relational database." },
+      { n: 7,  title: "MVC Framework",          art: "MVC",          img: "images/lab7.jpg",  url: "lab7.html",  desc: "Scalable web apps with Model-View-Controller." },
+      { n: 8,  title: "Advanced PHP",           art: "ADVANCED PHP", img: "images/lab8.jpg",  url: "lab8.html",  desc: "Security handling, sessions, and advanced features." },
+      { n: 9,  title: "JavaScript",             art: "JAVASCRIPT",   img: "images/lab9.jpg",  url: "lab9.html",  desc: "Interactivity and client-side validation." },
+      { n: 10, title: "jQuery",                 art: "JQUERY",       img: "images/lab10.jpg", url: "lab10.html", desc: "Simpler DOM manipulation and event handling." },
+      { n: 11, title: "AJAX + RESTful API",     art: "AJAX + API",   img: "images/lab11.jpg", url: "lab11.html", desc: "Exchanging data asynchronously with APIs and JSON." }
+    ];
+
+    const milestones = [
+      { n: 1, title: "Milestone 1: HTML + CSS",        art: "M1",    img: "images/milestone1.jpg",    stack: "UI layout and navigation structure",        label: "Milestone 1", url: "http://lrgs.ftsm.ukm.my/users/a219834/pt1/home.php", openOnPlay: true },
+      { n: 2, title: "Milestone 2: PHP + DB + MVC",    art: "M2",    img: "images/milestone2.jpg",    stack: "Backend architecture and authentication",   label: "Milestone 2" },
+      { n: 3, title: "Milestone 3: JavaScript + AJAX", art: "M3",    img: "images/milestone3.jpg",    stack: "Asynchronous data fetching and UX",         label: "Milestone 3" },
+      { n: 4, title: "Final: Enhancement",            art: "Final", img: "images/final-project.jpg", stack: "Testing, deployment, and documentation",    label: "Final milestone" }
+    ];
+
+    /* One list used by both pages: labs first, then milestones */
+    const queue = [
+      ...labs.map((l, i) => ({
+        kind: "lab", key: "lab" + l.n, title: l.title, sub: "Lab " + l.n + " · Weekly lab",
+        art: l.art, badge: String(l.n), img: l.img, color: COLORS[i % COLORS.length], url: l.url, openOnPlay: !!l.openOnPlay
+      })),
+      ...milestones.map((m, i) => ({
+        kind: "milestone", key: "ms" + m.n, title: m.title, sub: "Capstone · " + m.label,
+        art: m.art, badge: m.art, img: m.img, color: ["#1ed760", "#509bf5", "#f59b23", "#e8115b"][i], url: m.url || null, openOnPlay: !!m.openOnPlay
+      }))
+    ];
+
+    const ICON_PLAY  = '<svg viewBox="0 0 16 16"><path d="M3 1.713a.7.7 0 0 1 1.05-.607l10.89 6.288a.7.7 0 0 1 0 1.212L4.05 14.894A.7.7 0 0 1 3 14.288V1.713z"/></svg>';
+    const ICON_PAUSE = '<svg viewBox="0 0 16 16"><path d="M2.7 1a.7.7 0 0 0-.7.7v12.6a.7.7 0 0 0 .7.7h2.6a.7.7 0 0 0 .7-.7V1.7a.7.7 0 0 0-.7-.7H2.7zm8 0a.7.7 0 0 0-.7.7v12.6a.7.7 0 0 0 .7.7h2.6a.7.7 0 0 0 .7-.7V1.7a.7.7 0 0 0-.7-.7h-2.6z"/></svg>';
+
+    const $ = (id) => document.getElementById(id);
+    const inShell = window.parent !== window;           // true when loaded inside index.html
+    const send = (msg) => { if (inShell) window.parent.postMessage(msg, "*"); };
+
+    let state = { key: null, playing: false, liked: false };
+
+    /* =====================================================
+       RENDER
+       ===================================================== */
+
+    function render() {
+      $("labGrid").innerHTML = queue.filter(q => q.kind === "lab").map((q, i) =>
+        '<article class="card" data-key="' + q.key + '">' +
+          '<div class="artwork" style="background:linear-gradient(135deg,' + q.color + ',#121212 140%)">' +
+            '<span>' + q.art + '</span>' +
+            '<img src="' + q.img + '" alt="' + q.title + ' preview" loading="lazy" onerror="this.remove()">' +
+            '<button class="card-play" type="button" aria-label="Play ' + q.title + '" data-play="' + q.key + '">' + ICON_PLAY + '</button>' +
+          '</div>' +
+          '<h3 class="card-title">' + q.title + '</h3>' +
+          '<p class="card-desc">' + labs[i].desc + '</p>' +
+        '</article>'
+      ).join("");
+
+      $("trackList").innerHTML = queue.filter(q => q.kind === "milestone").map((q, i) =>
+        '<div class="track" data-key="' + q.key + '">' +
+          '<div class="num"><span>' + (i + 1) + '</span>' +
+            '<button type="button" aria-label="Play ' + q.title + '" data-play="' + q.key + '">' + ICON_PLAY + '</button></div>' +
+          '<div class="track-main">' +
+            '<div class="track-thumb" style="background:' + q.color + '"><span>' + milestones[i].art + '</span>' +
+              '<img src="' + q.img + '" alt="" loading="lazy" onerror="this.remove()"></div>' +
+            '<div style="min-width:0"><div class="track-name">' + q.title + '</div>' +
+            '<div class="track-artist">Haris Syahmi</div></div>' +
+          '</div>' +
+          '<div class="track-album">' + milestones[i].stack + '</div>' +
+          '<div class="track-link"><a href="#" data-details="' + milestones[i].label + '">View details</a></div>' +
+        '</div>'
+      ).join("");
+
+      applyState();
+    }
+
+    /* Reflect the player state (sent by index.html) on this page */
+    function applyState() {
+      document.querySelectorAll("[data-key]").forEach(el => {
+        el.classList.toggle("playing", el.dataset.key === state.key);
+      });
+      document.querySelectorAll("[data-play]").forEach(btn => {
+        const active = btn.dataset.play === state.key && state.playing;
+        btn.innerHTML = active ? ICON_PAUSE : ICON_PLAY;
+      });
+      $("bigPlay").innerHTML = state.playing ? ICON_PAUSE : ICON_PLAY;
+      $("bigPlay").setAttribute("aria-label", state.playing ? "Pause" : "Play");
+      const likeBtn = $("likeBtn");
+      const wasOn = likeBtn.classList.contains("on");
+      likeBtn.classList.toggle("on", state.liked);
+      likeBtn.setAttribute("aria-pressed", state.liked);
+      likeBtn.setAttribute("aria-label", state.liked ? "Remove from Your Library" : "Save to Your Library");
+      likeBtn.title = state.liked ? "Remove from Your Library" : "Save to Your Library";
+      if (state.liked && !wasOn) {                      // pop only when it becomes liked
+        likeBtn.classList.remove("pop"); void likeBtn.offsetWidth; likeBtn.classList.add("pop");
+      }
+    }
+
+    /* Helper function to execute item play action */
+    function playItem(key) {
+      const item = queue.find(x => x.key === key);
+      if (item && item.openOnPlay) {
+        if (item.kind === "lab") {
+          send({ type: "select", key });
+          visit(item.url);
+        } else {
+          openPage(item.url);
+        }
+        return;
+      }
+      if (key === state.key && state.playing) {
+        send({ type: "toggle" });
+      } else {
+        send({ type: "play", key });
+      }
+    }
+
+    /* =====================================================
+       EVENTS
+       ===================================================== */
+
+    document.addEventListener("click", (e) => {
+      // 1. Check for "View details" link inside milestone tracks
+      const details = e.target.closest("[data-details]");
+      if (details) {
+        e.preventDefault();
+        e.stopPropagation();
+        showPlaceholder(details.dataset.details);
+        return;
+      }
+
+      // 2. Check for explicit play button click or card / track row click
+      const playBtn = e.target.closest("[data-play]");
+      const card = e.target.closest(".card, .track");
+
+      if (playBtn) {
+        e.stopPropagation();
+        playItem(playBtn.dataset.play);
+      } else if (card && card.dataset.key) {
+        // Clicking the box has the exact same function as clicking its play button
+        playItem(card.dataset.key);
+      }
+    });
+
+    $("likeBtn").addEventListener("animationend", () => $("likeBtn").classList.remove("pop"));
+    $("bigPlay").addEventListener("click", () => send({ type: "toggle" }));
+    $("likeBtn").addEventListener("click", () => {
+      if (inShell) send({ type: "like" });
+      else { state.liked = !state.liked; applyState(); }
+    });
+
+    /* Back arrow: returns to the previous page */
+    $("fwdBtn").addEventListener("click", () => {
+      window.history.back();
+    });
+
+    window.addEventListener("scroll", () => {
+      $("topbar").classList.toggle("solid", window.scrollY > 200);
+    }, { passive: true });
+
+    /* Messages from index.html */
+    window.addEventListener("message", (e) => {
+      const m = e.data || {};
+      if (m.type === "state") {
+        state = { key: m.key, playing: m.playing, liked: m.liked };
+        applyState();
+      } else if (m.type === "goto") {
+        if (m.id === "home") window.scrollTo({ top: 0, behavior: "smooth" });
+        else { const t = document.getElementById(m.id); if (t) t.scrollIntoView({ behavior: "smooth" }); }
+      } else if (m.type === "hello") {
+        send({ type: "catalog", queue });
+      }
+    });
+
+    /* load the page inside this frame only: when menu.html is embedded in
+       index.html, just the menu section changes and the rest stays put */
+    function visit(url) {
+      window.location.href = url;
+    }
+
+    function openPage(url) { window.open(url, "_blank", "noopener"); }
+
+    function showPlaceholder(milestone) {
+      alert(milestone + " is currently a placeholder. Replace this action with your project URL when it is ready.");
+    }
+
+    render();
+    send({ type: "catalog", queue });      // give index.html the list for the Library + player
+  </script>
+</body>
+</html>

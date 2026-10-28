@@ -1,0 +1,21 @@
+/* Stylesheet 2: purple theme, pill menu on the right */
+.demo { line-height: 20px; background-color: #3b2a5a; border-radius: 6px; }
+.demo .wrapper { position: relative; overflow: auto; }
+
+.demo #top { color: #fff; padding: 15px; font-size: 30px; line-height: 26px; }
+.demo #top h1 { margin: 0; line-height: 50px; }
+.demo #menubar { width: 190px; float: right; }
+.demo #main { padding: 10px; background-color: #181818; color: #fff; font-size: 80%; border-radius: 6px; }
+.demo #main h1, .demo #main h2 { color: #c9a8e6; }
+.demo #sidebar { background-color: #2a1f44; color: #e6d9f5; padding: 10px; margin-top: 8px; border-radius: 6px; }
+.demo #bottom { text-align: center; padding: 10px; font-size: 70%; color: #e6d9f5; }
+.demo #menulist { padding: 0; }
+
+.demo .menuitem {
+    width: 155px; background-color: #8d67ab; border: 1px solid #8d67ab; border-radius: 40px;
+    color: #fff; list-style-type: none; margin: 10px; padding: 5px; text-align: center; cursor: pointer;
+}
+.demo .menuitem:hover { background-color: #fff; color: #3b2a5a; }
+
+.demo a { color: #c9a8e6; text-decoration: none; }
+.demo a:hover { text-decoration: underline; }

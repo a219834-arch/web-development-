@@ -1,0 +1,621 @@
+<!--
+Matric Number: A219834
+Name: Muhammad Haris Syahmi bin Nasurudin
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#121212">
+    <title>Menu | My Personal Pages</title>
+
+    <!-- Bootstrap Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+    <!-- Figtree: free font closest to Spotify's Circular -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --green: #1ed760;
+            --green-hover: #3be477;
+            --panel: #121212;
+            --subdued: #b3b3b3;
+            /* >>> YOUR PICTURE: put the file in the same folder as menu.html.
+                   Change the file name here if yours is different. <<< */
+            --banner: url("banner.jpg");
+            --font: "Circular Std", "Spotify Mix", "Figtree", "Helvetica Neue", Arial, sans-serif;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        html { background: var(--panel); scroll-behavior: smooth; }
+
+        body {
+            position: relative;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            background: var(--panel);
+            color: #fff;
+            font-family: var(--font);
+            -webkit-font-smoothing: antialiased;
+            overflow-x: hidden;
+            opacity: 1;
+            transition: opacity .3s ease-out;
+        }
+
+        /* Picture at the top. Falls back to the green gradient if the file is missing. */
+        .banner {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 480px;
+            z-index: 0;
+            pointer-events: none;
+            background:
+                linear-gradient(180deg, rgba(18,18,18,.15) 0%, rgba(18,18,18,.55) 60%, #121212 100%),
+                var(--banner) center / cover no-repeat,
+                linear-gradient(180deg, #1f5c38 0, #153f27 55%, #121212 100%);
+        }
+
+        .header, main { position: relative; z-index: 1; }
+
+        /* page exit fade (used when a link is clicked) */
+        body.page-transitioning { opacity: 0; }
+
+        a { color: inherit; text-decoration: none; }
+        svg { display: block; fill: currentColor; }
+        :focus-visible { outline: 2px solid #fff; outline-offset: 2px; }
+
+        ::-webkit-scrollbar { width: 12px; }
+        ::-webkit-scrollbar-thumb {
+            background: rgba(255,255,255,.3);
+            border-radius: 6px;
+            border: 3px solid transparent;
+            background-clip: padding-box;
+        }
+
+        /* ---------- TOP BAR ---------- */
+
+        .topbar {
+            position: sticky;
+            top: 0;
+            z-index: 10;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            padding: 16px 32px;
+            transition: background .25s;
+        }
+        .topbar.solid { background: rgba(18, 18, 18, .92); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); }
+
+        .history { display: flex; gap: 8px; }
+
+        .round-btn {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            border: none;
+            background: rgba(0, 0, 0, .7);
+            color: #fff;
+            display: grid;
+            place-items: center;
+            cursor: pointer;
+            transition: transform .1s, background .2s;
+        }
+        .round-btn:hover { transform: scale(1.06); background: rgba(0, 0, 0, .9); }
+        .round-btn svg { width: 16px; height: 16px; }
+        .round-btn[aria-disabled="true"] { opacity: .5; pointer-events: none; }
+
+        .avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            border: 4px solid #000;
+            background: var(--green);
+            color: #000;
+            font-size: 12px;
+            font-weight: 800;
+            display: grid;
+            place-items: center;
+            box-sizing: content-box;
+            margin: -4px;
+        }
+
+        /* ---------- HEADER ---------- */
+
+        .header { padding: 24px 32px 28px; }
+
+        .header .kind { font-size: 14px; font-weight: 700; margin-bottom: 8px; }
+
+        .header h1 {
+            font-size: clamp(36px, 7vw, 88px);
+            font-weight: 900;
+            line-height: 1;
+            letter-spacing: -.04em;
+            overflow-wrap: anywhere;
+            margin-bottom: 20px;
+        }
+
+        .header .meta {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 6px;
+            font-size: 14px;
+            color: #ffffffcc;
+        }
+        .header .meta strong { color: #fff; font-weight: 700; }
+        .header .meta .mini {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: var(--green);
+            color: #000;
+            font-size: 10px;
+            font-weight: 800;
+            display: grid;
+            place-items: center;
+        }
+        .dot::before { content: "•"; margin: 0 2px; }
+
+        /* ---------- CONTENT ---------- */
+
+        main { flex: 1; padding: 8px 32px 40px; }
+
+        .section-title {
+            font-size: 24px;
+            font-weight: 700;
+            letter-spacing: -.01em;
+            margin-bottom: 16px;
+        }
+
+        /* quick-access tiles, like Spotify's home shortcuts */
+        .menu-grid {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));   /* 3 boxes per row */
+            gap: 16px;
+        }
+
+        .tile {
+            position: relative;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            height: 80px;
+            border-radius: 4px;
+            background: rgba(255, 255, 255, .1);
+            overflow: hidden;
+            transition: background .3s;
+            user-select: none;
+        }
+        .tile:hover, .tile:focus-visible { background: rgba(255, 255, 255, .2); }
+
+        .tile-art {
+            width: 80px;
+            height: 80px;
+            flex-shrink: 0;
+            display: grid;
+            place-items: center;
+            font-size: 32px;
+            color: #fff;
+            box-shadow: 4px 0 16px rgba(0, 0, 0, .3);
+        }
+
+        .tile-text { min-width: 0; padding-right: 72px; }
+        .tile-title {
+            font-size: 16px;
+            font-weight: 700;
+            line-height: 1.25;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+        .tile-sub {
+            font-size: 13px;
+            color: var(--subdued);
+            margin-top: 2px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .tile-play {
+            position: absolute;
+            right: 16px;
+            top: 50%;
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            background: var(--green);
+            color: #000;
+            display: grid;
+            place-items: center;
+            box-shadow: 0 8px 8px rgba(0, 0, 0, .3);
+            opacity: 0;
+            transform: translateY(-30%);
+            transition: opacity .3s, transform .3s, background .2s;
+        }
+        .tile-play svg { width: 24px; height: 24px; }
+        .tile:hover .tile-play, .tile:focus-visible .tile-play {
+            opacity: 1;
+            transform: translateY(-50%);
+        }
+        .tile-play:hover { background: var(--green-hover); }
+
+        /* ---------- POPUP ---------- */
+
+        .tile.active { background: rgba(255, 255, 255, .2); }
+        .tile.active .tile-title { color: var(--green); }
+        .tile.active .tile-play { opacity: 1; transform: translateY(-50%); }
+
+        html.modal-open { overflow: hidden; }
+
+        .popup {
+            padding: 0;
+            border: 1px solid #ffffff1a;
+            border-radius: 12px;
+            background: #181818;
+            color: #fff;
+            width: min(1000px, calc(100vw - 32px));
+            height: min(82vh, 780px);
+            max-width: none;
+            max-height: none;
+            overflow: hidden;
+            box-shadow: 0 24px 80px rgba(0, 0, 0, .8);
+        }
+        .popup[open] {
+            display: flex;
+            flex-direction: column;
+            animation: popIn .25s cubic-bezier(.2, .9, .3, 1);
+        }
+        .popup::backdrop {
+            background: rgba(0, 0, 0, .72);
+            backdrop-filter: blur(4px);
+            -webkit-backdrop-filter: blur(4px);
+            animation: fadeIn .25s ease-out;
+        }
+        @keyframes popIn {
+            from { opacity: 0; transform: translateY(16px) scale(.96); }
+            to   { opacity: 1; transform: translateY(0) scale(1); }
+        }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+        .popup-head {
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            padding: 14px 16px 14px 20px;
+            background: #1f1f1f;
+            border-bottom: 1px solid #ffffff1a;
+        }
+        .popup-title { display: flex; align-items: center; gap: 12px; min-width: 0; }
+        .popup-art {
+            width: 44px;
+            height: 44px;
+            flex-shrink: 0;
+            border-radius: 4px;
+            display: grid;
+            place-items: center;
+            font-size: 20px;
+            color: #fff;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, .4);
+        }
+        .popup-kind { font-size: 11px; font-weight: 700; color: var(--subdued); text-transform: uppercase; letter-spacing: .08em; }
+        .popup-title h3 { font-size: 20px; font-weight: 800; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+        .popup-actions { display: flex; align-items: center; gap: 12px; flex-shrink: 0; }
+        .popup-open {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 18px;
+            border: 1px solid #727272;
+            border-radius: 999px;
+            font-size: 13px;
+            font-weight: 700;
+            white-space: nowrap;
+            transition: border-color .2s, transform .1s;
+        }
+        .popup-open:hover { border-color: #fff; transform: scale(1.03); }
+        .popup .round-btn { width: 36px; height: 36px; background: #ffffff1a; }
+        .popup .round-btn i { font-size: 15px; }
+
+        .popup-body { position: relative; flex: 1; min-height: 0; background: #121212; }
+        .popup-body iframe {
+            display: block;
+            width: 100%;
+            height: 100%;
+            border: 0;
+            background: #121212;
+        }
+        .popup-loading {
+            position: absolute;
+            inset: 0;
+            display: grid;
+            place-items: center;
+            color: var(--subdued);
+            font-size: 14px;
+            font-weight: 600;
+            pointer-events: none;
+        }
+        .popup-loading.done { display: none; }
+
+        @media (max-width: 640px) {
+            .popup { width: calc(100vw - 16px); height: calc(100vh - 16px); border-radius: 10px; }
+            .popup-head { padding: 10px 12px; }
+            .popup-title h3 { font-size: 17px; }
+            .popup-open { padding: 7px 12px; font-size: 12px; }
+        }
+
+        /* ---------- RESPONSIVE ---------- */
+
+        @media (max-width: 900px) {
+            .menu-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+        }
+
+        @media (max-width: 640px) {
+            .topbar { padding: 12px 16px; }
+            .header { padding: 12px 16px 20px; }
+            main { padding: 8px 16px 32px; }
+            .menu-grid { grid-template-columns: 1fr; gap: 8px; }
+            .tile-play { opacity: 1; transform: translateY(-50%); width: 40px; height: 40px; }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            * { transition: none !important; scroll-behavior: auto !important; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Banner picture (set in --banner above) -->
+    <div class="banner" aria-hidden="true"></div>
+
+    <!-- Top bar -->
+    <div class="topbar" id="topbar">
+        <div class="history">
+            <!-- Back / Forward work like the browser arrows -->
+            <button type="button" class="round-btn" id="back-btn" aria-label="Go back" title="Go back">
+                <svg viewBox="0 0 16 16"><path d="M11.03.47a.75.75 0 0 1 0 1.06L4.56 8l6.47 6.47a.75.75 0 1 1-1.06 1.06L2.44 8 9.97.47a.75.75 0 0 1 1.06 0z"/></svg>
+            </button>
+            <button type="button" class="round-btn" id="fwd-btn" aria-label="Go forward" title="Go forward">
+                <svg viewBox="0 0 16 16"><path d="M4.97.47a.75.75 0 0 0 0 1.06L11.44 8l-6.47 6.47a.75.75 0 1 0 1.06 1.06L13.56 8 6.03.47a.75.75 0 0 0-1.06 0z"/></svg>
+            </button>
+        </div>
+        <span class="avatar" aria-hidden="true">HS</span>
+    </div>
+
+    <!-- Header -->
+    <header class="header" id="header">
+        <p class="kind">Menu</p>
+        <h1 id="title">My Personal Pages</h1>
+        <div class="meta">
+            <span class="mini">HS</span>
+            <strong>Muhammad Haris Syahmi</strong>
+            <span class="dot">A219834</span>
+            <span class="dot">6 pages</span>
+        </div>
+    </header>
+
+    <!-- Main menu -->
+    <main id="content">
+        <h2 class="section-title">Pick a page</h2>
+
+        <div class="menu-grid">
+            <!-- Home -->
+            <a href="http://lrgs.ftsm.ukm.my/users/a219834/#" class="tile nav-link-item">
+                <span class="tile-art" style="background:#1ed760;color:#000"><i class="bi bi-house-door-fill"></i></span>
+                <span class="tile-text">
+                    <span class="tile-title">Home</span>
+                    <span class="tile-sub">Main portfolio</span>
+                </span>
+                <span class="tile-play" aria-hidden="true"><svg viewBox="0 0 16 16"><path d="M3 1.713a.7.7 0 0 1 1.05-.607l10.89 6.288a.7.7 0 0 1 0 1.212L4.05 14.894A.7.7 0 0 1 3 14.288V1.713z"/></svg></span>
+            </a>
+
+            <!-- Hi -->
+            <a href="hi.html" class="tile embed-tile" data-title="Hi" aria-haspopup="dialog">
+                <span class="tile-art" style="background:#e8115b"><i class="bi bi-emoji-smile-fill"></i></span>
+                <span class="tile-text">
+                    <span class="tile-title">Hi</span>
+                    <span class="tile-sub">Say hello</span>
+                </span>
+                <span class="tile-play" aria-hidden="true"><svg viewBox="0 0 16 16"><path d="M3 1.713a.7.7 0 0 1 1.05-.607l10.89 6.288a.7.7 0 0 1 0 1.212L4.05 14.894A.7.7 0 0 1 3 14.288V1.713z"/></svg></span>
+            </a>
+
+            <!-- Favorite Places -->
+            <a href="places.html" class="tile embed-tile" data-title="My Favorite Places" aria-haspopup="dialog">
+                <span class="tile-art" style="background:#509bf5"><i class="bi bi-geo-alt-fill"></i></span>
+                <span class="tile-text">
+                    <span class="tile-title">My Favorite Places</span>
+                    <span class="tile-sub">Where I love to go</span>
+                </span>
+                <span class="tile-play" aria-hidden="true"><svg viewBox="0 0 16 16"><path d="M3 1.713a.7.7 0 0 1 1.05-.607l10.89 6.288a.7.7 0 0 1 0 1.212L4.05 14.894A.7.7 0 0 1 3 14.288V1.713z"/></svg></span>
+            </a>
+
+            <!-- Computing Skills -->
+            <a href="skills.html" class="tile embed-tile" data-title="My Computing Skills" aria-haspopup="dialog">
+                <span class="tile-art" style="background:#af2896"><i class="bi bi-code-slash"></i></span>
+                <span class="tile-text">
+                    <span class="tile-title">My Computing Skills</span>
+                    <span class="tile-sub">What I can build</span>
+                </span>
+                <span class="tile-play" aria-hidden="true"><svg viewBox="0 0 16 16"><path d="M3 1.713a.7.7 0 0 1 1.05-.607l10.89 6.288a.7.7 0 0 1 0 1.212L4.05 14.894A.7.7 0 0 1 3 14.288V1.713z"/></svg></span>
+            </a>
+
+            <!-- Favorite Media -->
+            <a href="media.html" class="tile embed-tile" data-title="My Favorite Media" aria-haspopup="dialog">
+                <span class="tile-art" style="background:#f59b23;color:#000"><i class="bi bi-film"></i></span>
+                <span class="tile-text">
+                    <span class="tile-title">My Favorite Media</span>
+                    <span class="tile-sub">Shows, films and music</span>
+                </span>
+                <span class="tile-play" aria-hidden="true"><svg viewBox="0 0 16 16"><path d="M3 1.713a.7.7 0 0 1 1.05-.607l10.89 6.288a.7.7 0 0 1 0 1.212L4.05 14.894A.7.7 0 0 1 3 14.288V1.713z"/></svg></span>
+            </a>
+
+            <!-- Contact Me -->
+            <a href="contact.html" class="tile embed-tile" data-title="Contact Me" aria-haspopup="dialog">
+                <span class="tile-art" style="background:#8d67ab"><i class="bi bi-envelope-fill"></i></span>
+                <span class="tile-text">
+                    <span class="tile-title">Contact Me</span>
+                    <span class="tile-sub">Get in touch</span>
+                </span>
+                <span class="tile-play" aria-hidden="true"><svg viewBox="0 0 16 16"><path d="M3 1.713a.7.7 0 0 1 1.05-.607l10.89 6.288a.7.7 0 0 1 0 1.212L4.05 14.894A.7.7 0 0 1 3 14.288V1.713z"/></svg></span>
+            </a>
+        </div>
+    </main>
+
+    <!-- POPUP: the page you click opens here -->
+    <dialog class="popup" id="popup" aria-labelledby="popupTitle">
+        <div class="popup-head">
+            <div class="popup-title">
+                <span class="popup-art" id="popupArt" aria-hidden="true"></span>
+                <div>
+                    <p class="popup-kind">My Personal Pages</p>
+                    <h3 id="popupTitle"></h3>
+                </div>
+            </div>
+            <div class="popup-actions">
+                <a id="popupOpen" class="popup-open" href="#" target="_blank" rel="noopener">
+                    Open full page <i class="bi bi-box-arrow-up-right"></i>
+                </a>
+                <button type="button" class="round-btn" id="popupClose" aria-label="Close" title="Close (Esc)">
+                    <i class="bi bi-x-lg"></i>
+                </button>
+            </div>
+        </div>
+        <div class="popup-body">
+            <div class="popup-loading" id="popupLoading">Loading…</div>
+            <iframe id="popupFrame" title="Selected page"></iframe>
+        </div>
+    </dialog>
+
+    <script>
+        const backBtn = document.getElementById('back-btn');
+        const fwdBtn  = document.getElementById('fwd-btn');
+        const embedded = window.parent !== window;     // shown inside index.html's frame?
+
+        // Fade out, then run an action (go to a page / history step)
+        function fadeThen(action) {
+            document.body.classList.add('page-transitioning');
+            setTimeout(action, 300);
+        }
+
+        // Menu tiles
+        document.querySelectorAll('.nav-link-item').forEach(link => {
+            link.addEventListener('click', (e) => {
+                const url = link.getAttribute('href');
+                if (!url || url === '#') return;
+                e.preventDefault();
+                fadeThen(() => { window.location.href = url; });
+            });
+        });
+
+        // Back arrow: previous page in history. If there is none, go to index.html.
+        backBtn.addEventListener('click', () => {
+            if (history.length > 1 || embedded) {
+                const before = location.href;
+                history.back();
+                // nothing to go back to? (still here after a moment) -> index.html
+                if (!embedded) {
+                    setTimeout(() => { if (location.href === before) location.href = 'index.html'; }, 250);
+                }
+            } else {
+                fadeThen(() => { window.location.href = 'index.html'; });
+            }
+        });
+
+        // Forward arrow: next page in history (does nothing if there isn't one)
+        fwdBtn.addEventListener('click', () => history.forward());
+
+        // Keyboard: Alt + Left / Alt + Right
+        document.addEventListener('keydown', (e) => {
+            if (!e.altKey) return;
+            if (e.key === 'ArrowLeft')  { e.preventDefault(); backBtn.click(); }
+            if (e.key === 'ArrowRight') { e.preventDefault(); fwdBtn.click(); }
+        });
+
+        // ---------- Open the clicked page in a popup ----------
+        const popup      = document.getElementById('popup');
+        const popupFrame = document.getElementById('popupFrame');
+        const popupLoad  = document.getElementById('popupLoading');
+        const popupTitle = document.getElementById('popupTitle');
+        const popupArt   = document.getElementById('popupArt');
+        const popupOpen  = document.getElementById('popupOpen');
+        const embedTiles = Array.from(document.querySelectorAll('.embed-tile'));
+        let activeTile = null;
+
+        function openPopup(tile) {
+            activeTile = tile;
+            const url = tile.getAttribute('href');
+
+            embedTiles.forEach(t => t.classList.toggle('active', t === tile));
+
+            // copy the box's colour + icon into the popup header
+            const art = tile.querySelector('.tile-art');
+            popupArt.style.background = art.style.background;
+            popupArt.style.color = art.style.color || '#fff';
+            popupArt.innerHTML = art.innerHTML;
+            popupTitle.textContent = tile.dataset.title;
+            popupOpen.href = url;
+            popupFrame.title = tile.dataset.title;
+
+            popupLoad.classList.remove('done');
+            popupFrame.src = url;
+
+            document.documentElement.classList.add('modal-open');
+            if (!popup.open) popup.showModal();
+        }
+
+        function closePopup() {
+            if (popup.open) popup.close();
+        }
+
+        // Runs for every way of closing: X button, Esc, or clicking outside
+        popup.addEventListener('close', () => {
+            popupFrame.src = 'about:blank';
+            embedTiles.forEach(t => t.classList.remove('active'));
+            document.documentElement.classList.remove('modal-open');
+            if (activeTile) activeTile.focus({ preventScroll: true });
+            activeTile = null;
+        });
+
+        embedTiles.forEach(tile => {
+            tile.addEventListener('click', (e) => {
+                e.preventDefault();
+                openPopup(tile);
+            });
+        });
+
+        document.getElementById('popupClose').addEventListener('click', closePopup);
+
+        // Click on the dark area outside the popup closes it
+        popup.addEventListener('click', (e) => {
+            if (e.target === popup) closePopup();
+        });
+
+        // Hide "Loading…" once the page has loaded
+        popupFrame.addEventListener('load', () => {
+            if (popupFrame.src === 'about:blank' || !popup.open) return;
+            popupLoad.classList.add('done');
+        });
+
+        // Top bar turns dark once you scroll
+        const topbar = document.getElementById('topbar');
+        window.addEventListener('scroll', () => {
+            topbar.classList.toggle('solid', window.scrollY > 120);
+        }, { passive: true });
+
+        // Coming back with the browser Back button: undo the fade
+        window.addEventListener('pageshow', () => document.body.classList.remove('page-transitioning'));
+    </script>
+</body>
+</html>

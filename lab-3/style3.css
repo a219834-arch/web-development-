@@ -1,0 +1,17 @@
+/* Stylesheet 3: dark cards, green headings, horizontal menu */
+.demo { line-height: 26px; }
+.demo .wrapper { position: relative; overflow: auto; }
+
+.demo #sidebar { background-color: #121212; border: 1px solid #2a2a2a; padding-left: 10px; border-radius: 6px; }
+.demo #bottom { text-align: center; padding: 10px; font-size: 70%; line-height: 14px; color: #b3b3b3; }
+.demo h1, .demo h2, .demo h3 { color: #1ed760; }
+
+.demo #menulist { padding: 0; position: relative; overflow: auto; }
+.demo .menuitem {
+    width: 165px; float: left; background-color: #2a2a2a; color: #fff; border-radius: 999px;
+    list-style-type: none; margin: 4px; padding: 2px; text-align: center; cursor: pointer;
+}
+.demo .menuitem:hover { background-color: #1ed760; color: #000; }
+
+.demo a { color: #fff; }
+.demo a:hover { color: #1ed760; }

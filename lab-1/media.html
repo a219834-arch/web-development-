@@ -1,0 +1,249 @@
+<!--
+Matric Number: A219834
+Name: Muhammad Haris Syahmi bin Nasurudin
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>My Favorite Media</title>
+
+    <!-- Bootstrap Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+    <!-- Figtree: free font closest to Spotify's Circular -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --green: #1ed760;
+            --panel: #121212;
+            --card: #181818;
+            --card-hover: #282828;
+            --subdued: #b3b3b3;
+            --font: "Circular Std", "Spotify Mix", "Figtree", "Helvetica Neue", Arial, sans-serif;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        html { color-scheme: dark; }
+
+        body {
+            min-height: 100vh;
+            background: linear-gradient(180deg, #3b2a5a 0, #1b1429 220px, var(--panel) 420px);
+            background-color: var(--panel);
+            color: #fff;
+            font-family: var(--font);
+            -webkit-font-smoothing: antialiased;
+            padding: 32px;
+        }
+
+        a { color: inherit; text-decoration: none; }
+        :focus-visible { outline: 2px solid #fff; outline-offset: 2px; }
+
+        .wrap { max-width: 900px; margin: 0 auto; }
+
+        /* ---------- HEADER ---------- */
+
+        .head { display: flex; align-items: flex-end; gap: 24px; margin-bottom: 32px; }
+
+        .cover {
+            width: 140px;
+            height: 140px;
+            flex-shrink: 0;
+            border-radius: 4px;
+            background: #8d67ab;
+            color: #fff;
+            display: grid;
+            place-items: center;
+            font-size: 64px;
+            box-shadow: 0 4px 60px rgba(0, 0, 0, .5);
+        }
+
+        .head .kind { font-size: 14px; font-weight: 700; margin-bottom: 8px; }
+        .head h1 {
+            font-size: clamp(32px, 6vw, 64px);
+            font-weight: 900;
+            line-height: 1;
+            letter-spacing: -.03em;
+            margin-bottom: 14px;
+        }
+        .head .meta { font-size: 14px; color: #ffffffcc; }
+        .head .meta strong { color: #fff; font-weight: 700; }
+
+        /* ---------- SECTIONS ---------- */
+
+        .section { margin-bottom: 36px; }
+        .section-title { font-size: 22px; font-weight: 700; margin-bottom: 16px; }
+
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 16px; }
+
+        .media-card {
+            background: var(--card);
+            border-radius: 8px;
+            padding: 16px;
+            transition: background .25s;
+            animation: cardIn .5s ease-out both;
+        }
+        .media-card:hover { background: var(--card-hover); }
+
+        @keyframes cardIn {
+            from { opacity: 0; transform: translateY(12px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+
+        .media-head { display: flex; align-items: center; gap: 12px; margin-bottom: 16px; }
+
+        .icon {
+            width: 44px;
+            height: 44px;
+            flex-shrink: 0;
+            border-radius: 50%;
+            display: grid;
+            place-items: center;
+            font-size: 20px;
+            color: #000;
+        }
+        .icon.green { background: #1ed760; }
+        .icon.blue  { background: #509bf5; }
+        .icon.pink  { background: linear-gradient(45deg, #f9a825, #e8115b 55%, #8d67ab); color: #fff; }
+
+        .label { font-size: 12px; font-weight: 700; color: var(--subdued); text-transform: uppercase; letter-spacing: .08em; }
+        .value { font-size: 18px; font-weight: 700; margin-top: 2px; }
+
+        /* ---------- MEDIA ELEMENTS ---------- */
+
+        .media-img {
+            display: block;
+            width: 100%;
+            max-height: 340px;
+            object-fit: cover;
+            border-radius: 6px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, .5);
+            transition: transform .3s ease, box-shadow .3s ease;
+        }
+        .media-img:hover { transform: scale(1.02); box-shadow: 0 12px 32px rgba(0, 0, 0, .7); }
+
+        .caption {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            margin-top: 12px;
+            color: var(--subdued);
+            font-size: 13px;
+            transition: color .2s;
+        }
+        a:hover .caption, a:focus-visible .caption { color: var(--green); }
+
+        audio { display: block; width: 100%; }
+
+        video {
+            display: block;
+            width: 100%;
+            border-radius: 8px;
+            background: #000;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, .5);
+        }
+
+        /* ---------- RESPONSIVE ---------- */
+
+        @media (max-width: 640px) {
+            body { padding: 20px 16px; }
+            .head { flex-direction: column; align-items: flex-start; gap: 16px; }
+            .cover { width: 100px; height: 100px; font-size: 44px; }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            * { transition: none !important; animation: none !important; }
+        }
+    </style>
+</head>
+<body>
+    <div class="wrap">
+
+        <header class="head">
+            <div class="cover" aria-hidden="true"><i class="bi bi-film"></i></div>
+            <div>
+                <p class="kind">Page</p>
+                <h1>My Favorite Media</h1>
+                <p class="meta"><strong>Muhammad Haris Syahmi</strong> • A219834 • Pictures, music and video I enjoy</p>
+            </div>
+        </header>
+
+        <!-- Pictures -->
+        <section class="section">
+            <h2 class="section-title">Pictures</h2>
+            <div class="grid">
+
+                <div class="media-card">
+                    <div class="media-head">
+                        <span class="icon blue"><i class="bi bi-image-fill"></i></span>
+                        <div>
+                            <div class="label">Picture</div>
+                            <div class="value">Static</div>
+                        </div>
+                    </div>
+                    <a href="https://upload.wikimedia.org/wikipedia/commons/e/e0/North_Pole_ice_cover.jpg" target="_blank" rel="noopener">
+                        <img src="fd0db569a20f0781ab04fffc9048c176.jpg" alt="Static Picture" class="media-img">
+                        <span class="caption"><i class="bi bi-box-arrow-up-right"></i> Click image to view in new tab</span>
+                    </a>
+                </div>
+
+                <div class="media-card">
+                    <div class="media-head">
+                        <span class="icon pink"><i class="bi bi-images"></i></span>
+                        <div>
+                            <div class="label">Picture</div>
+                            <div class="value">Animated</div>
+                        </div>
+                    </div>
+                    <a href="https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExeWZqb3J4ZDRicmtvZnEwbG4xbzFwM2o3YjBxdnBhZjY1OXN5bXJpbyZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/3o7TKsjLu9K1f8I6pW/giphy.gif" target="_blank" rel="noopener">
+                        <img src="giphy.gif" alt="Animated GIF" class="media-img">
+                        <span class="caption"><i class="bi bi-box-arrow-up-right"></i> Click GIF to view in new tab</span>
+                    </a>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- Music -->
+        <section class="section">
+            <h2 class="section-title">Music</h2>
+            <div class="media-card">
+                <div class="media-head">
+                    <span class="icon green"><i class="bi bi-music-note-beamed"></i></span>
+                    <div>
+                        <div class="label">Audio</div>
+                        <div class="value">My favorite song</div>
+                    </div>
+                </div>
+                <audio controls>
+                    <source src="song.mp3" type="audio/mpeg">
+                    Your browser does not support the audio element.
+                </audio>
+            </div>
+        </section>
+
+        <!-- Video -->
+        <section class="section">
+            <h2 class="section-title">Video</h2>
+            <div class="media-card">
+                <div class="media-head">
+                    <span class="icon pink"><i class="bi bi-film"></i></span>
+                    <div>
+                        <div class="label">Video</div>
+                        <div class="value">My favorite video</div>
+                    </div>
+                </div>
+                <video controls>
+                    <source src="video.mp4" type="video/mp4">
+                    Your browser does not support the video tag.
+                </video>
+            </div>
+        </section>
+
+    </div>
+</body>
+</html>

@@ -1,0 +1,940 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Spotify Portfolio | Muhammad Haris Syahmi</title>
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Ccircle cx='12' cy='12' r='12' fill='%231ed760'/%3E%3Cg fill='none' stroke='%23000' stroke-linecap='round'%3E%3Cpath d='M5.5 9.2c4.2-1.2 8.8-.8 12.8 1.4' stroke-width='2.2'/%3E%3Cpath d='M6.3 12.7c3.6-1 7.4-.7 10.7 1.2' stroke-width='1.8'/%3E%3Cpath d='M7 15.9c3-.8 6-.5 8.7 1' stroke-width='1.5'/%3E%3C/g%3E%3C/svg%3E">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --green: #1ed760;
+      --green-hover: #3be477;
+      --base: #000;
+      --panel: #121212;
+      --highlight: #1f1f1f;
+      --hover: #2a2a2a;
+      --text: #fff;
+      --subdued: #b3b3b3;
+      --font: "Circular Std", "Spotify Mix", "Figtree", "Helvetica Neue", Arial, sans-serif;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html, body { height: 100%; }
+    body {
+      background: var(--base);
+      color: var(--text);
+      font-family: var(--font);
+      -webkit-font-smoothing: antialiased;
+      overflow: hidden;
+    }
+
+    a { color: inherit; text-decoration: none; }
+    button { font-family: inherit; }
+    svg { display: block; fill: currentColor; }
+    :focus-visible { outline: 2px solid #fff; outline-offset: 2px; }
+
+    /* ---------- LAYOUT ---------- */
+
+    .app {
+      display: grid;
+      grid-template-columns: 300px minmax(0, 1fr);
+      grid-template-rows: minmax(0, 1fr) 72px;
+      height: 100vh;
+      gap: 8px;
+      padding: 8px;
+    }
+
+    .sidebar {
+      grid-row: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      min-height: 0;
+    }
+
+    .box { background: var(--panel); border-radius: 8px; }
+
+    .stage {
+      grid-row: 1;
+      min-width: 0;
+      border-radius: 8px;
+      overflow: hidden;
+      background: var(--panel);
+    }
+    .stage iframe {
+      width: 100%;
+      height: 100%;
+      border: 0;
+      display: block;
+      background: var(--panel);
+    }
+
+    /* ---------- SIDEBAR: NAV ---------- */
+
+    .nav-box { padding: 12px; }
+
+    .nav a {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      padding: 8px 12px;
+      height: 40px;
+      color: var(--subdued);
+      font-weight: 700;
+      font-size: 16px;
+      transition: color .2s;
+    }
+    .nav a:hover, .nav a.active { color: var(--text); }
+    .nav svg { width: 24px; height: 24px; flex-shrink: 0; }
+
+    /* ---------- SIDEBAR: LIBRARY ---------- */
+
+    .library {
+      flex: 1;
+      min-height: 0;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .library-head {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 16px 16px 8px;
+      color: var(--subdued);
+      font-weight: 700;
+      font-size: 16px;
+    }
+    .library-head svg { width: 24px; height: 24px; }
+
+    .chips { display: flex; gap: 8px; padding: 8px 16px 12px; }
+
+    .chip {
+      border: none;
+      background: var(--highlight);
+      color: var(--text);
+      font-size: 14px;
+      font-weight: 500;
+      padding: 6px 12px;
+      border-radius: 999px;
+      cursor: pointer;
+      transition: background .2s;
+    }
+    .chip:hover { background: var(--hover); }
+    .chip[hidden] { display: none; }
+    .chip.on { background: #fff; color: #000; }
+
+    .library-list { flex: 1; overflow-y: auto; padding: 0 8px 8px; }
+
+    .library-list::-webkit-scrollbar { width: 12px; }
+    .library-list::-webkit-scrollbar-thumb {
+      background: rgba(255,255,255,.3);
+      border-radius: 6px;
+      border: 3px solid transparent;
+      background-clip: padding-box;
+    }
+
+    .lib-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 8px;
+      border-radius: 6px;
+      cursor: pointer;
+      width: 100%;
+      background: none;
+      border: none;
+      color: inherit;
+      text-align: left;
+    }
+    .lib-item:hover { background: var(--highlight); }
+    .lib-item.playing .lib-title { color: var(--green); }
+
+    .lib-art {
+      position: relative;
+      width: 48px; height: 48px;
+      border-radius: 4px;
+      flex-shrink: 0;
+      display: grid;
+      place-items: center;
+      font-weight: 800;
+      font-size: 13px;
+      color: #fff;
+      overflow: hidden;
+    }
+    .lib-art img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+
+    .lib-group {
+      padding: 14px 8px 6px;
+      color: var(--subdued);
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+    }
+    .lib-text { min-width: 0; }
+    .lib-title { font-size: 16px; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .lib-sub { font-size: 14px; color: var(--subdued); margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+    .lib-empty { padding: 16px; color: var(--subdued); font-size: 14px; }
+
+    /* ---------- PLAYER BAR ---------- */
+
+    .player {
+      grid-column: 1 / -1;
+      grid-row: 2;
+      display: grid;
+      grid-template-columns: minmax(180px, 1fr) minmax(0, 2fr) minmax(180px, 1fr);
+      align-items: center;
+      gap: 16px;
+      padding: 0 8px;
+    }
+
+    .now { display: flex; align-items: center; gap: 14px; min-width: 0; }
+    .now-art {
+      position: relative;
+      width: 56px; height: 56px; border-radius: 4px; flex-shrink: 0;
+      display: grid; place-items: center; font-weight: 800; color: #000;
+      background: linear-gradient(135deg, var(--green), #124c29);
+      overflow: hidden;
+    }
+    .now-art img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+    .now-text { min-width: 0; }
+    .now-title { font-size: 14px; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .now-sub { font-size: 12px; color: var(--subdued); margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+    .icon-btn {
+      background: none;
+      border: none;
+      color: var(--subdued);
+      cursor: pointer;
+      display: grid;
+      place-items: center;
+      transition: color .2s, transform .1s;
+    }
+    .icon-btn:hover { color: #fff; transform: scale(1.06); }
+    .icon-btn.on { color: var(--green); }
+
+    .center { display: flex; flex-direction: column; align-items: center; gap: 8px; min-width: 0; }
+    .controls { display: flex; align-items: center; gap: 16px; }
+    .controls .icon-btn svg { width: 20px; height: 20px; }
+    .now .icon-btn svg { width: 16px; height: 16px; }
+
+    .play-btn {
+      width: 32px; height: 32px;
+      border-radius: 50%;
+      border: none;
+      background: #fff;
+      color: #000;
+      display: grid;
+      place-items: center;
+      cursor: pointer;
+      transition: transform .1s;
+    }
+    .play-btn:hover { transform: scale(1.06); }
+    .play-btn svg { width: 16px; height: 16px; }
+
+    .progress-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      width: 100%;
+      max-width: 620px;
+      font-size: 11px;
+      color: var(--subdued);
+      font-variant-numeric: tabular-nums;
+    }
+    .progress-row span { min-width: 36px; }
+    .progress-row span:first-child { text-align: right; }
+
+    /* Draggable sliders (progress + volume) */
+    .bar {
+      position: relative;
+      flex: 1;
+      height: 16px;
+      display: flex;
+      align-items: center;
+      cursor: pointer;
+      touch-action: none;       /* lets touch dragging work without scrolling */
+      user-select: none;
+      -webkit-user-select: none;
+    }
+    .bar-track { width: 100%; height: 4px; background: #4d4d4d; border-radius: 2px; overflow: hidden; pointer-events: none; }
+    .bar-fill { height: 100%; width: 0; background: #fff; border-radius: 2px; }
+    .bar-knob {
+      position: absolute; left: 0; top: 50%;
+      width: 12px; height: 12px; border-radius: 50%; background: #fff;
+      transform: translate(-50%, -50%);
+      opacity: 0;
+      pointer-events: none;
+    }
+    .bar:hover .bar-fill, .bar.dragging .bar-fill { background: var(--green); }
+    .bar:hover .bar-knob, .bar.dragging .bar-knob, .bar:focus-visible .bar-knob { opacity: 1; }
+
+    .right { display: flex; align-items: center; justify-content: flex-end; gap: 12px; }
+    .right .icon-btn svg { width: 20px; height: 20px; }
+    .status { color: var(--green); font-size: 12px; font-weight: 700; white-space: nowrap; }
+    .vol { flex: 0 0 96px; }
+
+    /* ---------- HEART ---------- */
+    .icon-btn .heart { overflow: visible; }
+    .icon-btn .heart path {
+      fill: none;
+      stroke: currentColor;
+      stroke-width: 2;
+      stroke-linejoin: round;
+      transition: fill .15s;
+    }
+    .icon-btn.on { color: var(--green); }
+    .icon-btn.on .heart path { fill: currentColor; }
+    .icon-btn.pop .heart { animation: heartPop .35s cubic-bezier(.3, 1.6, .5, 1); }
+    @keyframes heartPop {
+      0%   { transform: scale(.8); }
+      60%  { transform: scale(1.25); }
+      100% { transform: scale(1); }
+    }
+
+    /* ---------- TOAST ---------- */
+    .toast {
+      position: fixed;
+      left: 50%;
+      bottom: 96px;
+      transform: translate(-50%, 12px);
+      background: #2e77d0;
+      color: #fff;
+      font-size: 14px;
+      font-weight: 700;
+      padding: 12px 20px;
+      border-radius: 8px;
+      box-shadow: 0 8px 24px rgba(0,0,0,.5);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity .2s, transform .2s;
+      z-index: 50;
+    }
+    .toast.show { opacity: 1; transform: translate(-50%, 0); }
+
+    /* ---------- RESPONSIVE ---------- */
+
+    @media (max-width: 1100px) {
+      .app { grid-template-columns: 72px minmax(0, 1fr); }
+      .nav a span, .library-head span, .chips, .lib-text, .lib-group { display: none; }
+      .nav a { justify-content: center; padding: 8px 0; }
+      .library-head { justify-content: center; padding: 16px 0 8px; }
+      .lib-item { justify-content: center; padding: 8px 0; }
+      .nav-box { padding: 12px 4px; }
+      .library-list { padding: 0 4px 8px; }
+    }
+
+    @media (max-width: 800px) {
+      .status, .vol, #muteBtn { display: none; }
+      .player { grid-template-columns: minmax(0, 1fr) auto; }
+      .center { align-items: flex-end; }
+      .progress-row { display: none; }
+      .controls .hide-sm { display: none; }
+    }
+
+    @media (max-width: 640px) {
+      .app { display: flex; flex-direction: column; height: 100vh; padding: 0; gap: 0; }
+      .sidebar { display: none; }
+      .stage { flex: 1; border-radius: 0; }
+      .player { padding: 8px 12px; background: #000; min-height: 64px; flex-shrink: 0; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      * { transition: none !important; }
+    }
+  </style>
+</head>
+
+<body>
+  <!-- Hidden audio element for actual sound playback -->
+  <audio id="audioPlayer" preload="metadata"></audio>
+
+  <div class="app">
+
+    <!-- ===== SIDEBAR ===== -->
+    <aside class="sidebar">
+      <nav class="box nav-box nav" aria-label="Main">
+        <a href="#" data-goto="home" class="active">
+          <svg viewBox="0 0 24 24"><path d="M12.5 3.247a1 1 0 0 0-1 0L4 7.577V20h4.5v-6a1 1 0 0 1 1-1h5a1 1 0 0 1 1 1v6H20V7.577l-7.5-4.33zm-2-1.732a3 3 0 0 1 3 0l7.5 4.33a2 2 0 0 1 1 1.732V21a1 1 0 0 1-1 1h-6.5a1 1 0 0 1-1-1v-6h-3v6a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V7.577a2 2 0 0 1 1-1.732l7.5-4.33z"/></svg>
+          <span>Home</span>
+        </a>
+        <a href="#" data-goto="labs">
+          <svg viewBox="0 0 24 24"><path d="M3 22a1 1 0 0 1-1-1V3a1 1 0 0 1 2 0v18a1 1 0 0 1-1 1zm6 0a1 1 0 0 1-1-1V3a1 1 0 0 1 2 0v18a1 1 0 0 1-1 1zm10.618-3.97L13.38 5.558a1 1 0 0 1 .447-1.342l1.79-.894a1 1 0 0 1 1.342.447l6.236 12.472a1 1 0 0 1-.447 1.342l-1.79.894a1 1 0 0 1-1.341-.447z"/></svg>
+          <span>Weekly Labs</span>
+        </a>
+        <a href="#" data-goto="capstone">
+          <svg viewBox="0 0 24 24"><path d="M12 2 1 7l11 5 9-4.09V17h2V7L12 2zM5 12.5v4c0 1.66 3.13 3 7 3s7-1.34 7-3v-4l-7 3.18-7-3.18z"/></svg>
+          <span>Capstone Project</span>
+        </a>
+        <a href="http://lrgs.ftsm.ukm.my/users/a219834/#" target="_blank" rel="noopener">
+          <svg viewBox="0 0 24 24"><path d="M12 12a5 5 0 1 0 0-10 5 5 0 0 0 0 10zm0 2c-4.42 0-8 2.24-8 5v2h16v-2c0-2.76-3.58-5-8-5z"/></svg>
+          <span>University Profile</span>
+        </a>
+      </nav>
+
+      <section class="box library" aria-label="Your Library">
+        <div class="library-head">
+          <svg viewBox="0 0 24 24"><path d="M14.5 2.134a1 1 0 0 1 1 0l6 3.464a1 1 0 0 1 .5.866V21a1 1 0 0 1-1 1h-6a1 1 0 0 1-1-1V3a1 1 0 0 1 .5-.866zM16 4.732V20h4V7.041l-4-2.309zM3 22a1 1 0 0 1-1-1V3a1 1 0 0 1 2 0v18a1 1 0 0 1-1 1zm6 0a1 1 0 0 1-1-1V3a1 1 0 0 1 2 0v18a1 1 0 0 1-1 1z"/></svg>
+          <span>Your Library</span>
+        </div>
+        <div class="chips">
+          <button class="chip on" data-filter="all" type="button">All</button>
+          <button class="chip" data-filter="lab" type="button">Weekly labs</button>
+          <button class="chip" data-filter="milestone" type="button">Capstone project</button>
+        </div>
+        <div class="library-list" id="libraryList">
+          <p class="lib-empty">Loading…</p>
+        </div>
+      </section>
+    </aside>
+
+    <!-- ===== CENTRE: menu.html ===== -->
+    <main class="stage">
+      <iframe id="view" src="menu.html" title="Portfolio menu"></iframe>
+    </main>
+
+    <!-- ===== PLAYER BAR ===== -->
+    <div class="player" role="region" aria-label="Now playing">
+      <div class="now">
+        <div class="now-art" id="nowArt"><span>≋</span></div>
+        <div class="now-text">
+          <div class="now-title" id="nowTitle">Web Development</div>
+          <div class="now-sub" id="nowSub">Haris Syahmi · Portfolio</div>
+        </div>
+        <button class="icon-btn" id="nowLike" type="button" aria-label="Save to Your Library" aria-pressed="false" title="Save to Your Library">
+          <svg class="heart" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
+        </button>
+      </div>
+
+      <div class="center">
+        <div class="controls">
+          <button class="icon-btn hide-sm" id="shuffleBtn" type="button" aria-label="Shuffle" aria-pressed="false">
+            <svg viewBox="0 0 16 16"><path d="M13.151.922a.75.75 0 1 0-1.06 1.06L13.109 3H11.16a3.75 3.75 0 0 0-2.873 1.34l-6.173 7.356A2.25 2.25 0 0 1 .39 12.5H0V14h.391a3.75 3.75 0 0 0 2.873-1.34l6.173-7.356a2.25 2.25 0 0 1 1.724-.804h1.947l-1.017 1.018a.75.75 0 0 0 1.06 1.06L15.98 3.75 13.15.922zM.391 3.5H0V2h.391c1.109 0 2.16.49 2.873 1.34L4.89 5.277l-.979 1.167-1.796-2.14A2.25 2.25 0 0 0 .39 3.5z"/><path d="m7.5 10.723.98-1.167.957 1.14a2.25 2.25 0 0 0 1.724.804h1.947l-1.017-1.018a.75.75 0 1 1 1.06-1.06l2.829 2.828-2.829 2.828a.75.75 0 1 1-1.06-1.06L13.109 13H11.16a3.75 3.75 0 0 1-2.873-1.34l-.787-.938z"/></svg>
+          </button>
+          <button class="icon-btn" id="prevBtn" type="button" aria-label="Previous">
+            <svg viewBox="0 0 16 16"><path d="M3.3 1a.7.7 0 0 1 .7.7v5.15l9.95-5.744a.7.7 0 0 1 1.05.606v12.575a.7.7 0 0 1-1.05.607L4 9.149V14.3a.7.7 0 0 1-.7.7H1.7a.7.7 0 0 1-.7-.7V1.7a.7.7 0 0 1 .7-.7h1.6z"/></svg>
+          </button>
+          <button class="play-btn" id="playBtn" type="button" aria-label="Play"></button>
+          <button class="icon-btn" id="nextBtn" type="button" aria-label="Next">
+            <svg viewBox="0 0 16 16"><path d="M12.7 1a.7.7 0 0 0-.7.7v5.15L2.05 1.107A.7.7 0 0 0 1 1.712v12.575a.7.7 0 0 0 1.05.607L12 9.149V14.3a.7.7 0 0 0 .7.7h1.6a.7.7 0 0 0 .7-.7V1.7a.7.7 0 0 0-.7-.7h-1.6z"/></svg>
+          </button>
+          <button class="icon-btn hide-sm" id="repeatBtn" type="button" aria-label="Repeat" aria-pressed="false">
+            <svg viewBox="0 0 16 16"><path d="M0 4.75A3.75 3.75 0 0 1 3.75 1h8.5A3.75 3.75 0 0 1 16 4.75v5a3.75 3.75 0 0 1-3.75 3.75H9.81l1.018 1.018a.75.75 0 1 1-1.06 1.06L6.939 12.75l2.829-2.828a.75.75 0 1 1 1.06 1.06L9.811 12h2.439a2.25 2.25 0 0 0 2.25-2.25v-5a2.25 2.25 0 0 0-2.25-2.25h-8.5A2.25 2.25 0 0 0 1.5 4.75v5A2.25 2.25 0 0 0 3.75 12H5v1.5H3.75A3.75 3.75 0 0 1 0 9.75v-5z"/></svg>
+          </button>
+        </div>
+        <div class="progress-row">
+          <span id="timeNow">0:00</span>
+          <div class="bar" id="bar" role="slider" aria-label="Progress" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" tabindex="0">
+            <div class="bar-track"><div class="bar-fill" id="barFill"></div></div>
+            <div class="bar-knob" id="barKnob"></div>
+          </div>
+          <span id="timeTotal">0:00</span>
+        </div>
+      </div>
+
+      <div class="right">
+        <span class="status" id="statusText">● Paused</span>
+        <button class="icon-btn" id="muteBtn" type="button" aria-label="Mute">
+          <svg viewBox="0 0 16 16"><path d="M9.741.85a.75.75 0 0 1 .375.65v13a.75.75 0 0 1-1.125.65l-6.925-4a3.642 3.642 0 0 1-1.33-4.967 3.639 3.639 0 0 1 1.33-1.332l6.925-4a.75.75 0 0 1 .75 0zm-6.924 5.3a2.139 2.139 0 0 0 0 3.7l5.8 3.35V2.8l-5.8 3.35zm8.683 4.29V5.56a2.75 2.75 0 0 1 0 4.88z"/></svg>
+        </button>
+        <div class="bar vol" id="volBar" role="slider" aria-label="Volume" aria-valuemin="0" aria-valuemax="100" aria-valuenow="70" tabindex="0">
+          <div class="bar-track"><div class="bar-fill" id="volFill" style="width:70%"></div></div>
+          <div class="bar-knob" id="volKnob" style="left:70%"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+  <script>
+    /* =======================================================
+       AUDIO TRACK MAPPING
+       Change these paths to your own MP3 files.
+       Tip: local files work best (put the .mp3 next to this
+       HTML file, and avoid spaces/symbols in the file name).
+       ======================================================= */
+    const AUDIO_MAP = {
+      /* Weekly labs (keys must match menu.html) */
+      "lab1":  "song1.mp3",
+      "lab2":  "song6.mp3",
+      "lab3":  "song.mp3",
+      "lab4":  "song.mp3",
+      "lab5":  "song.mp3",
+      "lab6":  "song.mp3",
+      "lab7":  "song.mp3",
+      "lab8":  "song.mp3",
+      "lab9":  "song.mp3",
+      "lab10": "song.mp3",
+      "lab11": "song.mp3",
+
+      /* Capstone project */
+      "ms1": "song.mp3",
+      "ms2": "song.mp3",
+      "ms3": "song.mp3",
+      "ms4": "song.mp3",
+
+      /* Used only by the tile-style menu (Hi, Places, Skills, Media, Contact) */
+      "hi":      "song1.mp3",
+      "places":  "song2.mp3",
+      "skills":  "song3.mp3",
+      "media":   "song4.mp3",
+      "contact": "song5.mp3",
+
+      "biodata": "song6.mp3",
+      "login":   "song7.mp3",
+      "search":  "song8.mp3",
+    };
+
+    const ICON_PLAY  = '<svg viewBox="0 0 16 16"><path d="M3 1.713a.7.7 0 0 1 1.05-.607l10.89 6.288a.7.7 0 0 1 0 1.212L4.05 14.894A.7.7 0 0 1 3 14.288V1.713z"/></svg>';
+    const ICON_PAUSE = '<svg viewBox="0 0 16 16"><path d="M2.7 1a.7.7 0 0 0-.7.7v12.6a.7.7 0 0 0 .7.7h2.6a.7.7 0 0 0 .7-.7V1.7a.7.7 0 0 0-.7-.7H2.7zm8 0a.7.7 0 0 0-.7.7v12.6a.7.7 0 0 0 .7.7h2.6a.7.7 0 0 0 .7-.7V1.7a.7.7 0 0 0-.7-.7h-2.6z"/></svg>';
+
+    const $ = (id) => document.getElementById(id);
+    const frame = $("view");
+    const audio = $("audioPlayer");
+
+    let queue = [];
+    let index = -1;
+    let shuffle = false, repeat = false, liked = false;
+    let libFilter = "all";
+    let libVisible = true;        // false while a page other than menu.html is open
+    let lastVolume = 0.7;
+    let seeking = false;          // true while the progress bar is being dragged
+
+    const isPlaying = () => !audio.paused && !audio.ended;
+
+    audio.volume = 0.7;
+
+    /* ---------- Talk to menu.html ---------- */
+
+    function toMenu(msg) {
+      if (frame.contentWindow) frame.contentWindow.postMessage(msg, "*");
+    }
+    function pushState() {
+      toMenu({ type: "state", key: index >= 0 ? queue[index].key : null, playing: isPlaying(), liked });
+    }
+
+    window.addEventListener("message", (e) => {
+      if (e.source !== frame.contentWindow) return;
+      const m = e.data || {};
+      switch (m.type) {
+        case "catalog": {
+          const currentKey = index >= 0 ? queue[index].key : null;
+          queue = m.queue || [];
+          index = currentKey ? queue.findIndex(q => q.key === currentKey) : -1;
+          renderLibrary();
+          pushState();
+          break;
+        }
+        case "play":   playKey(m.key); break;
+        case "start":  startKey(m.key); break;   // from menu tiles: always play, never pause
+        case "select": startKey(m.key); break;   // lab cards that open a page: load AND play the song
+        case "toggle": toggle(); break;
+        case "like":   setLiked(!liked); break;
+      }
+    });
+
+    /* Is the centre frame currently showing menu.html? (works because all pages are on the same site) */
+    function frameOnMenu() {
+      try { return /\/menu\.html$/i.test(frame.contentWindow.location.pathname); }
+      catch (_) { return false; }
+    }
+
+    /* Sidebar Home / Weekly Labs / Capstone: if another page is open in the frame,
+       go back to menu.html first, then scroll to the right section. */
+    let pendingGoto = null;
+
+    function gotoSection(id) {
+      if (frameOnMenu()) {
+        toMenu({ type: "goto", id });
+      } else {
+        pendingGoto = id;
+        frame.src = "menu.html";
+      }
+    }
+
+    /* A page with no background of its own (e.g. a plain "Good Login" page)
+       is shown on white instead of the dark panel. */
+    function paintFrameBackground() {
+      try {
+        const d = frame.contentDocument, w = frame.contentWindow;
+        const clear = (c) => c === 'rgba(0, 0, 0, 0)' || c === 'transparent';
+        const plain = d && d.body &&
+                      clear(w.getComputedStyle(d.documentElement).backgroundColor) &&
+                      clear(w.getComputedStyle(d.body).backgroundColor);
+        frame.style.background = plain ? '#fff' : '';
+      } catch (_) { frame.style.background = ''; }
+    }
+
+    frame.addEventListener("load", () => {
+      paintFrameBackground();
+      setLibraryVisible(frameOnMenu());     // labs + capstone only show on menu.html
+      toMenu({ type: "hello" });
+      if (pendingGoto && frameOnMenu()) {
+        const id = pendingGoto;
+        pendingGoto = null;
+        setTimeout(() => toMenu({ type: "goto", id }), 150);
+      }
+    });
+
+    /* If menu.html never sends a catalog, build one from AUDIO_MAP
+       so the play button still works. */
+    function ensureQueue() {
+      if (queue.length) return true;
+      queue = Object.keys(AUDIO_MAP).map((key, i) => ({
+        key: key,
+        title: key.charAt(0).toUpperCase() + key.slice(1),
+        sub: "Haris Syahmi · Portfolio",
+        kind: key.indexOf("lab") === 0 ? "lab" : key.indexOf("ms") === 0 ? "milestone" : "page",
+        color: "#1ed760",
+        badge: String(i + 1),
+        img: ""
+      }));
+      renderLibrary();
+      return true;
+    }
+
+    /* ---------- Library (Sidebar) ---------- */
+
+    function libItem(q) {
+      return '<button class="lib-item' + (index >= 0 && queue[index].key === q.key ? ' playing' : '') + '" type="button" data-key="' + q.key + '">' +
+        '<div class="lib-art" style="background:linear-gradient(135deg,' + q.color + ',#121212 140%)"><span>' + q.badge + '</span>' +
+          (q.img ? '<img src="' + q.img + '" alt="" loading="lazy" onerror="this.remove()">' : '') + '</div>' +
+        '<div class="lib-text"><div class="lib-title">' + q.title + '</div>' +
+        '<div class="lib-sub">' + (q.kind === "page" ? "Page" : q.kind === "lab" ? "Weekly lab" : "Capstone project") + ' · Haris Syahmi</div></div>' +
+      '</button>';
+    }
+
+    /* v = true while menu.html is open.
+       On any other page only the "All" chip is shown; "Weekly labs" and
+       "Capstone project" come back when you return to menu.html. */
+    function setLibraryVisible(v) {
+      libVisible = v;
+      document.querySelectorAll(".chip").forEach(c => {
+        c.hidden = !v && c.dataset.filter !== "all";
+      });
+      if (!v && libFilter !== "all") {
+        libFilter = "all";
+        document.querySelectorAll(".chip").forEach(c => c.classList.toggle("on", c.dataset.filter === "all"));
+      }
+      renderLibrary();
+    }
+
+    function renderLibrary() {
+      const groups = [
+        { kind: "lab",       label: "Weekly labs" },
+        { kind: "milestone", label: "Capstone project" },
+        { kind: "page",      label: "Pages" }
+      ];
+      let html = "";
+      groups.forEach(g => {
+        if (libFilter !== "all" && libFilter !== g.kind) return;
+        const items = queue.filter(q => q.kind === g.kind);
+        if (!items.length) return;
+        if (libFilter === "all") html += '<div class="lib-group">' + g.label + '</div>';
+        html += items.map(libItem).join("");
+      });
+      $("libraryList").innerHTML = html || '<p class="lib-empty">Nothing here yet.</p>';
+    }
+
+    $("libraryList").addEventListener("click", (e) => {
+      const item = e.target.closest(".lib-item");
+      if (item) playKey(item.dataset.key);
+    });
+
+    document.querySelectorAll(".chip").forEach(chip => chip.addEventListener("click", () => {
+      document.querySelectorAll(".chip").forEach(c => c.classList.toggle("on", c === chip));
+      libFilter = chip.dataset.filter;
+      renderLibrary();
+    }));
+
+    document.querySelectorAll(".nav a[data-goto]").forEach(a => a.addEventListener("click", (e) => {
+      e.preventDefault();
+      document.querySelectorAll(".nav a").forEach(x => x.classList.remove("active"));
+      a.classList.add("active");
+      gotoSection(a.dataset.goto);
+    }));
+
+    /* ---------- Player UI ---------- */
+
+    function fmt(s) {
+      if (!isFinite(s) || s < 0) return "0:00";
+      return Math.floor(s / 60) + ":" + String(Math.floor(s % 60)).padStart(2, "0");
+    }
+
+    function setProgressUI(pct, elapsed) {
+      $("barFill").style.width = pct + "%";
+      $("barKnob").style.left = pct + "%";
+      $("bar").setAttribute("aria-valuenow", Math.round(pct));
+      $("timeNow").textContent = fmt(elapsed);
+    }
+
+    function updateUI() {
+      const total = isFinite(audio.duration) ? audio.duration : 0;
+      if (!seeking) {
+        const elapsed = audio.currentTime || 0;
+        setProgressUI(total > 0 ? (elapsed / total) * 100 : 0, elapsed);
+      }
+      $("timeTotal").textContent = fmt(total);
+
+      const p = isPlaying();
+      $("playBtn").innerHTML = p ? ICON_PAUSE : ICON_PLAY;
+      $("playBtn").setAttribute("aria-label", p ? "Pause" : "Play");
+      $("statusText").textContent = p ? "● Playing Audio" : "● Paused";
+    }
+
+    function loadTrack(i) {
+      if (!ensureQueue()) return;
+      index = (i + queue.length) % queue.length;
+      const q = queue[index];
+
+      const src = AUDIO_MAP[q.key];
+      if (src) {
+        audio.src = src;
+      } else {
+        audio.pause();
+        audio.removeAttribute("src");
+        showToast("No song set for \u201c" + q.title + "\u201d in AUDIO_MAP");
+      }
+      audio.load();
+
+      $("nowTitle").textContent = q.title;
+      $("nowSub").textContent = q.sub;
+      $("nowArt").style.background = "linear-gradient(135deg," + q.color + ",#121212 140%)";
+      $("nowArt").innerHTML = '<span>' + q.badge + '</span>' +
+        (q.img ? '<img src="' + q.img + '" alt="" onerror="this.remove()">' : '');
+
+      renderLibrary();
+      updateUI();
+      pushState();
+    }
+
+    function play() {
+      if (!ensureQueue()) return;
+      if (index < 0) loadTrack(0);
+      if (!audio.getAttribute("src")) return;
+
+      const p = audio.play();
+      if (p && p.catch) {
+        p.catch((err) => {
+          if (err && err.name === "AbortError") return;   // interrupted by a new load, ignore
+          showToast("Can't play this track. Check the audio file path.");
+          updateUI();
+          pushState();
+        });
+      }
+    }
+
+    function pause() { audio.pause(); }
+
+    function toggle() { isPlaying() ? pause() : play(); }
+
+    function playKey(key) {
+      ensureQueue();
+      const i = queue.findIndex(q => q.key === key);
+      if (i < 0) return;
+      if (i === index) { toggle(); return; }
+      loadTrack(i);
+      play();
+    }
+
+    function startKey(key) {
+      ensureQueue();
+      const i = queue.findIndex(q => q.key === key);
+      if (i < 0) return;
+      if (i !== index) loadTrack(i);
+      if (!isPlaying()) play();
+    }
+
+    function next(auto) {
+      if (!ensureQueue()) return;
+      if (auto && repeat) {
+        audio.currentTime = 0;
+        play();
+        return;
+      }
+      loadTrack(shuffle ? Math.floor(Math.random() * queue.length) : index + 1);
+      play();
+    }
+
+    /* ---------- Audio events (keep the UI in sync with real playback) ---------- */
+
+    audio.addEventListener("timeupdate", updateUI);
+    audio.addEventListener("loadedmetadata", updateUI);
+    audio.addEventListener("durationchange", updateUI);
+    audio.addEventListener("play",  () => { updateUI(); pushState(); });
+    audio.addEventListener("pause", () => { updateUI(); pushState(); });
+    audio.addEventListener("ended", () => next(true));
+    audio.addEventListener("error", () => {
+      if (index < 0) return;
+      showToast("Couldn't load audio for this track.");
+      updateUI();
+      pushState();
+    });
+
+    /* ---------- Toast ---------- */
+
+    let toastTimer = null;
+    function showToast(text) {
+      const t = $("toast");
+      t.textContent = text;
+      t.classList.add("show");
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => t.classList.remove("show"), 2500);
+    }
+
+    function setLiked(v) {
+      liked = v;
+      const btn = $("nowLike");
+      btn.classList.toggle("on", liked);
+      btn.setAttribute("aria-pressed", liked);
+      btn.setAttribute("aria-label", liked ? "Remove from Your Library" : "Save to Your Library");
+      btn.title = liked ? "Remove from Your Library" : "Save to Your Library";
+      if (liked) {
+        btn.classList.remove("pop"); void btn.offsetWidth; btn.classList.add("pop");
+      }
+      showToast(liked ? "Added to Your Library" : "Removed from Your Library");
+      pushState();
+    }
+
+    /* ---------- Draggable slider helper ----------
+       Works with mouse, touch and pen. Pointer capture keeps the
+       drag alive even when the cursor leaves the bar or passes
+       over the iframe. */
+
+    function makeSlider(el, handlers) {
+      let active = false;
+      let lastRatio = 0;
+
+      const ratioFrom = (e) => {
+        const r = el.getBoundingClientRect();
+        return Math.min(1, Math.max(0, (e.clientX - r.left) / r.width));
+      };
+
+      el.addEventListener("pointerdown", (e) => {
+        if (e.pointerType === "mouse" && e.button !== 0) return;
+        active = true;
+        el.setPointerCapture(e.pointerId);
+        el.classList.add("dragging");
+        if (handlers.start) handlers.start();
+        lastRatio = ratioFrom(e);
+        handlers.move(lastRatio);
+        e.preventDefault();
+      });
+
+      el.addEventListener("pointermove", (e) => {
+        if (!active) return;
+        lastRatio = ratioFrom(e);
+        handlers.move(lastRatio);
+      });
+
+      const finish = () => {
+        if (!active) return;
+        active = false;
+        el.classList.remove("dragging");
+        if (handlers.end) handlers.end(lastRatio);
+      };
+      el.addEventListener("pointerup", finish);
+      el.addEventListener("pointercancel", finish);
+      el.addEventListener("lostpointercapture", finish);
+    }
+
+    /* ---------- Progress bar (drag to seek) ---------- */
+
+    makeSlider($("bar"), {
+      start() {
+        if (index < 0) loadTrack(0);
+        seeking = true;
+      },
+      move(p) {
+        const total = isFinite(audio.duration) ? audio.duration : 0;
+        setProgressUI(p * 100, p * total);          // live preview while dragging
+      },
+      end(p) {
+        seeking = false;
+        if (isFinite(audio.duration) && audio.duration > 0) {
+          audio.currentTime = p * audio.duration;   // apply the new position
+        }
+        updateUI();
+      }
+    });
+
+    $("bar").addEventListener("keydown", (e) => {
+      if (!isFinite(audio.duration)) return;
+      if (e.key === "ArrowRight") { audio.currentTime = Math.min(audio.duration, audio.currentTime + 5); updateUI(); e.preventDefault(); }
+      if (e.key === "ArrowLeft")  { audio.currentTime = Math.max(0, audio.currentTime - 5); updateUI(); e.preventDefault(); }
+    });
+
+    /* ---------- Volume bar (drag to adjust) ---------- */
+
+    function setVolume(v) {
+      v = Math.min(1, Math.max(0, v));
+      audio.volume = v;
+      if (v > 0) lastVolume = v;
+      $("volFill").style.width = (v * 100) + "%";
+      $("volKnob").style.left = (v * 100) + "%";
+      $("volBar").setAttribute("aria-valuenow", Math.round(v * 100));
+    }
+
+    makeSlider($("volBar"), {
+      move(p) { setVolume(p); }                    // changes volume live while dragging
+    });
+
+    $("volBar").addEventListener("keydown", (e) => {
+      if (e.key === "ArrowRight" || e.key === "ArrowUp")   { setVolume(audio.volume + 0.05); e.preventDefault(); }
+      if (e.key === "ArrowLeft"  || e.key === "ArrowDown") { setVolume(audio.volume - 0.05); e.preventDefault(); }
+    });
+
+    $("muteBtn").addEventListener("click", () => {
+      if (audio.volume > 0) {
+        lastVolume = audio.volume;
+        setVolume(0);
+      } else {
+        setVolume(lastVolume || 0.7);
+      }
+    });
+
+    /* ---------- Transport buttons ---------- */
+
+    $("playBtn").addEventListener("click", toggle);
+    $("nextBtn").addEventListener("click", () => next(false));
+    $("prevBtn").addEventListener("click", () => {
+      if (audio.currentTime > 3) {
+        audio.currentTime = 0;
+        updateUI();
+      } else {
+        ensureQueue();
+        loadTrack(index < 0 ? 0 : index - 1);
+        play();
+      }
+    });
+
+    $("shuffleBtn").addEventListener("click", function () {
+      shuffle = !shuffle; this.classList.toggle("on", shuffle); this.setAttribute("aria-pressed", shuffle);
+    });
+    $("repeatBtn").addEventListener("click", function () {
+      repeat = !repeat; this.classList.toggle("on", repeat); this.setAttribute("aria-pressed", repeat);
+    });
+    $("nowLike").addEventListener("click", () => setLiked(!liked));
+    $("nowLike").addEventListener("animationend", () => $("nowLike").classList.remove("pop"));
+
+    // Spacebar play / pause shortcut
+    document.addEventListener("keydown", (e) => {
+      if (e.code === "Space" && !e.target.closest("button, [role=slider], a")) {
+        e.preventDefault();
+        toggle();
+      }
+    });
+
+    updateUI();
+  </script>
+</body>
+</html>

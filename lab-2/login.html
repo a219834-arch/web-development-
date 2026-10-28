@@ -1,0 +1,308 @@
+<!--
+Matric Number: A219834
+Name: Muhammad Haris Syahmi bin Nasurudin
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Login Form</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --green: #1ed760;
+            --green-hover: #3be477;
+            --panel: #121212;
+            --card: #181818;
+            --card-hover: #282828;
+            --subdued: #b3b3b3;
+            --accent: #8d67ab;   /* same purple as hi.html / contact.html */
+            --tint: #3b2a5a;
+            --font: "Circular Std", "Spotify Mix", "Figtree", "Helvetica Neue", Arial, sans-serif;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        html { color-scheme: dark; }
+
+        body {
+            min-height: 100vh;
+            background: linear-gradient(180deg, var(--tint) 0, #1b1429 220px, var(--panel) 420px);
+            background-color: var(--panel);
+            color: #fff;
+            font-family: var(--font);
+            -webkit-font-smoothing: antialiased;
+            padding: 32px;
+        }
+
+        a { color: inherit; text-decoration: none; }
+        :focus-visible { outline: 2px solid #fff; outline-offset: 2px; }
+
+        .wrap { max-width: 900px; margin: 0 auto; }
+
+        /* ---------- HEADER ---------- */
+
+        .head { display: flex; align-items: flex-end; gap: 24px; margin-bottom: 32px; }
+
+        .cover {
+            width: 140px;
+            height: 140px;
+            flex-shrink: 0;
+            border-radius: 4px;
+            background: var(--accent);
+            color: #fff;
+            display: grid;
+            place-items: center;
+            font-size: 64px;
+            box-shadow: 0 4px 60px rgba(0, 0, 0, .5);
+        }
+
+        .head .kind { font-size: 14px; font-weight: 700; margin-bottom: 8px; }
+        .head h1 {
+            font-size: clamp(32px, 6vw, 64px);
+            font-weight: 900;
+            line-height: 1;
+            letter-spacing: -.03em;
+            margin-bottom: 14px;
+        }
+        .head .meta { font-size: 14px; color: #ffffffcc; }
+        .head .meta strong { color: #fff; font-weight: 700; }
+
+        .intro { color: #e6e6e6; font-size: 16px; line-height: 1.7; max-width: 70ch; margin-bottom: 28px; }
+
+        /* ---------- SECTIONS + PANELS ---------- */
+
+        .section { margin-bottom: 32px; }
+        .section-title { font-size: 22px; font-weight: 700; margin-bottom: 16px; }
+
+        .panel {
+            background: var(--card);
+            border-radius: 8px;
+            padding: 20px;
+        }
+
+        .fields {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 20px;
+        }
+        .field { display: flex; flex-direction: column; gap: 8px; min-width: 0; }
+        .field.full { grid-column: 1 / -1; }
+
+        .label {
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--subdued);
+            text-transform: uppercase;
+            letter-spacing: .08em;
+        }
+
+        /* ---------- INPUTS ---------- */
+
+        input[type="text"], input[type="number"], input[type="email"], input[type="date"],
+        input[type="tel"], input[type="url"], input[type="file"], input[type="password"], input[type="search"], textarea, select {
+            width: 100%;
+            background: #2a2a2a;
+            color: #fff;
+            border: 1px solid transparent;
+            border-radius: 6px;
+            padding: 12px 14px;
+            font-family: inherit;
+            font-size: 16px;
+            transition: background .2s, border-color .2s, box-shadow .2s;
+        }
+        input:hover, textarea:hover, select:hover { background: #303030; }
+        input:focus, textarea:focus, select:focus {
+            outline: none;
+            background: #303030;
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px #8d67ab55;
+        }
+        input:user-invalid, textarea:user-invalid, select:user-invalid { border-color: #e8115b; }
+
+        ::placeholder { color: #8a8a8a; }
+        textarea { resize: vertical; min-height: 110px; }
+        select option { background: #282828; color: #fff; }
+
+        /* radio buttons as pills */
+        .choices { display: flex; gap: 10px; flex-wrap: wrap; }
+        .choice { position: relative; }
+        .choice input { position: absolute; opacity: 0; inset: 0; cursor: pointer; }
+        .choice label {
+            display: inline-block;
+            padding: 10px 22px;
+            border-radius: 999px;
+            background: #2a2a2a;
+            font-weight: 700;
+            font-size: 14px;
+            cursor: pointer;
+            transition: background .2s, color .2s;
+        }
+        .choice input:hover + label { background: #3a3a3a; }
+        .choice input:checked + label { background: var(--green); color: #000; }
+        .choice input:focus-visible + label { outline: 2px solid #fff; outline-offset: 2px; }
+
+        /* height slider */
+        .range-row { display: flex; align-items: center; gap: 16px; }
+        input[type="range"] { flex: 1; accent-color: var(--green); height: 24px; cursor: pointer; }
+        .range-val { min-width: 74px; text-align: right; font-weight: 700; font-variant-numeric: tabular-nums; }
+
+        /* colour picker */
+        input[type="color"] {
+            width: 72px;
+            height: 46px;
+            padding: 4px;
+            background: #2a2a2a;
+            border: 1px solid transparent;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+
+        /* file picker */
+        input[type="file"] { padding: 8px; }
+        input[type="file"]::file-selector-button {
+            background: #fff;
+            color: #000;
+            border: none;
+            border-radius: 999px;
+            padding: 8px 18px;
+            margin-right: 14px;
+            font-family: inherit;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        /* ---------- BUTTONS ---------- */
+
+        .actions { display: flex; flex-wrap: wrap; gap: 12px; margin: 8px 0 8px; }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            border: none;
+            border-radius: 999px;
+            padding: 14px 32px;
+            font-family: inherit;
+            font-size: 14px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: transform .1s, background .2s, border-color .2s;
+        }
+        .btn:hover { transform: scale(1.04); }
+        .btn.primary { background: var(--green); color: #000; }
+        .btn.primary:hover { background: var(--green-hover); }
+        .btn.ghost { background: none; color: #fff; border: 1px solid #727272; }
+        .btn.ghost:hover { border-color: #fff; }
+
+        /* ---------- EXTRA (login + search) ---------- */
+
+        .panel.fields.one { grid-template-columns: 1fr; max-width: 560px; }
+
+        .pw { position: relative; }
+        .pw input { padding-right: 48px; }
+        .eye {
+            position: absolute;
+            right: 6px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: var(--subdued);
+            font-size: 18px;
+            padding: 8px;
+            cursor: pointer;
+        }
+        .eye:hover { color: #fff; }
+
+        input[type="search"] { -webkit-appearance: none; appearance: none; }
+        .searchbar { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 8px; }
+        .search-input { position: relative; flex: 1; min-width: 220px; }
+        .search-input i { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); color: var(--subdued); pointer-events: none; }
+        .search-input input { padding-left: 42px; }
+
+        /* ---------- RESPONSIVE ---------- */
+
+        @media (max-width: 640px) {
+            body { padding: 20px 16px; }
+            .head { flex-direction: column; align-items: flex-start; gap: 16px; }
+            .cover { width: 100px; height: 100px; font-size: 44px; }
+            .fields { grid-template-columns: 1fr; }
+            .panel { padding: 16px; }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            * { transition: none !important; animation: none !important; }
+        }
+    </style>
+</head>
+<body>
+    <div class="wrap">
+
+        <header class="head">
+            <div class="cover" aria-hidden="true"><i class="bi bi-shield-lock-fill"></i></div>
+            <div>
+                <p class="kind">Page</p>
+                <h1>Login Form</h1>
+                <p class="meta"><strong>Muhammad Haris Syahmi</strong> • A219834 • Lab 2: HTML Forms</p>
+            </div>
+        </header>
+
+        <p class="intro">Enter your username and password, then press <strong>Login</strong>.</p>
+
+        <form action="http://lrgs.ftsm.ukm.my/users/a123456/lab-2/process_login.php" method="post" target="_blank">
+
+            <section class="section">
+                <h2 class="section-title">Sign in</h2>
+                <div class="panel fields one">
+
+                    <div class="field">
+                        <label class="label" for="username">Username</label>
+                        <input type="text" id="username" name="username" autocomplete="username" autofocus required>
+                    </div>
+
+                    <div class="field">
+                        <label class="label" for="password">Password</label>
+                        <div class="pw">
+                            <input type="password" id="password" name="password" autocomplete="current-password" required>
+                            <button type="button" class="eye" id="eye" aria-label="Show password" title="Show password">
+                                <i class="bi bi-eye-fill"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                </div>
+            </section>
+
+            <input type="hidden" name="matricnum" value="a219834">
+
+            <div class="actions">
+                <button type="submit" name="login_form" value="Login" class="btn primary">
+                    <i class="bi bi-box-arrow-in-right"></i> Login
+                </button>
+                <button type="reset" class="btn ghost">
+                    <i class="bi bi-arrow-counterclockwise"></i> Reset
+                </button>
+            </div>
+
+        </form>
+
+    </div>
+    <script>
+        // Show / hide the password
+        document.getElementById('eye').addEventListener('click', function () {
+            var input = document.getElementById('password');
+            var show = input.type === 'password';
+            input.type = show ? 'text' : 'password';
+            this.innerHTML = show ? '<i class="bi bi-eye-slash-fill"></i>' : '<i class="bi bi-eye-fill"></i>';
+            this.setAttribute('aria-label', show ? 'Hide password' : 'Show password');
+            this.title = show ? 'Hide password' : 'Show password';
+        });
+    </script>
+</body>
+</html>
